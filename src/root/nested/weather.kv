@@ -1,10 +1,5 @@
 #:kivy 1.9.1
 #: import sm kivy.uix.screenmanager
-    
-<Screen1>:
-	name: "screen1"
-	Label:
-		text: "Data Visualisation Screen"
 		
 <Screen2>:
 	name: "screen2"
@@ -37,11 +32,20 @@
 			pos: 0, self.parent.height * 0.4
 			size_hint: 1, 0.2
 			on_press: self.parent.parent.parent.toggle_screen('screen3')
-	ScreenManager:
-		id: screen_manager
-		transition: sm.SwapTransition()
-		Screen1
-		Screen2
-		Screen3
+	Screen:
+		FloatLayout:
+			ScreenManager:
+				id: screen_manager
+				transition: sm.SwapTransition()
+				VisualisationScreen
+				Screen2
+				Screen3
+			Button:
+				text: "="
+				pos: 0, self.parent.height * 0.8
+				size_hint: (0.1, 0.2)
+				on_press: self.parent.parent.parent.parent.toggle_state()
+		
+			
 		
 	

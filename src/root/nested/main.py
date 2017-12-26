@@ -13,9 +13,7 @@ from kivy.garden.navigationdrawer import NavigationDrawer
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.dropdown import DropDown
 
-
-class Screen1(Screen):
-    pass
+from visualisation import VisualisationScreen
 
 class Screen2(Screen):
     pass
