@@ -1,0 +1,47 @@
+#:kivy 1.9.1
+#: import sm kivy.uix.screenmanager
+    
+<Screen1>:
+	name: "screen1"
+	Label:
+		text: "Data Visualisation Screen"
+		
+<Screen2>:
+	name: "screen2"
+	Label:
+		text: "Data Analytics Screen"
+
+<Screen3>:
+	name: "screen3"
+	canvas.before:
+        Color:
+            rgba: 0, 5, 2, 1
+	Label:
+		text: "Data Forecasting Screen"
+
+<Menu>:
+	screen_manager: screen_manager
+	FloatLayout:
+		Button:
+			text: "Data Visualisation"
+			pos: 0, self.parent.height * 0.8
+			size_hint: 1, 0.2
+			on_press: self.parent.parent.parent.toggle_screen('screen1')
+		Button:
+			text: "Data Analytics"
+			pos: 0, self.parent.height * 0.6
+			size_hint: 1, 0.2
+			on_press: self.parent.parent.parent.toggle_screen('screen2')
+		Button:
+			text: "Data Forecasting"
+			pos: 0, self.parent.height * 0.4
+			size_hint: 1, 0.2
+			on_press: self.parent.parent.parent.toggle_screen('screen3')
+	ScreenManager:
+		id: screen_manager
+		transition: sm.SwapTransition()
+		Screen1
+		Screen2
+		Screen3
+		
+	

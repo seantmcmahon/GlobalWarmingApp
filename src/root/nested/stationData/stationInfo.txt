@@ -1,0 +1,38 @@
+station					country				open	filename
+Aberporth				Wales				true	aberporth.txt
+Armagh					Northern Ireland	true	armagh.txt
+Ballypatrick Forest		Northern Ireland	true	ballypatrickForest.txt
+Bradford				England				true	bradford.txt
+Braemar					Scotland			true	braemar.txt
+Camborne				England				true	camborne.txt
+Cambridge NIAB			England				true	cambridgeNIAB.txt
+Cardiff Bute Park		Wales				true	cardiffButePark.txt
+Chivenor				England				true	chivenor.txt
+Cwmystwyth				Wales				false	cwmystwyth.txt
+Dunstaffnage			Scotland			true	dunstaffnage.txt
+Durham					England				true	durham.txt
+Eastbourne				England				true	eastbourne.txt
+Eskdalemuir				Scotland			true	eskdalemuir.txt
+Heathrow				England				true	heathrow.txt
+Hurn					England				true	hurn.txt
+Lerwick					Scotland			true	lerwick.txt
+Leuchars				Scotland			true	leuchars.txt
+Lowestoft				England				true	lowestoft.txt
+Manston					England				true	manston.txt
+Nairn					Scotland			true	nairn.txt
+Newton Rigg				England				true	newtonRigg.txt
+Oxford					England				true	oxford.txt
+Paisley					Scotland			true	paisley.txt
+Ringway					England				false	ringway.txt
+Ross-On-Wye				Wales				true	rossOnWye.txt
+Shawbury				England				true	shawbury.txt
+Sheffield				England				true	sheffield.txt
+Southampton				England				false	southampton.txt
+Stornoway				Scotland			true	stornoway.txt
+Sutton Bonington		England				true	suttonBonington.txt
+Tiree					Scotland			true	tiree.txt
+Valley					Wales				true	valley.txt
+Waddington				England				true	waddington.txt
+Whitby					England				true	whitby.txt
+Wick Airport			Scotland			true	wickAirport.txt
+Yeovilton				England				true	yeovilton.txt
