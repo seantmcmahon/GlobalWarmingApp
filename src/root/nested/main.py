@@ -6,6 +6,10 @@ Created on 7 Dec 2017
 import kivy
 kivy.require('1.9.1')
 
+from kivy.config import Config
+Config.set('graphics', 'width', '500')
+Config.set('graphics', 'height', '250')
+
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.widget import Widget

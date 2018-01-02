@@ -1,20 +1,68 @@
 <DataSelectScreen>:
 	name: "selection"
+	button_height: self.dropdown_height
+	graph_dd: graph_dropdown.__self__
 	canvas.before:
         Color:
             rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
+        Color:
+			rgba: [0.77, 0.15, 0.15, 1]
+		Rectangle:
+	        pos: 0, self.height * 0.8
+            size: self.width, self.height * 0.2
+            
+	Label:
+		pos: 0, self.parent.height * 0.8
+		size_hint: (1, 0.2)
+	    text: "CREATE GRAPH"
+	    halign: "center"
+	    color: 1, 1, 1, 1
+	    
+	Label:
+		pos: self.parent.width * 0.1, self.parent.height * 0.7
+		size_hint: (0.1, 0.05)
+	    text: "Graph Type:" 
+	    color: 0, 0, 0, 1 
+	
 	Button:
-		text: "Data Selection Screen"
-		pos: 50, 50
-		size_hint: (0.5, 0.5)
+        id: graph_btn
+        text: 'Press'
+        on_release: graph_dropdown.open(self)
+        pos: self.parent.width * 0.1, self.parent.height * 0.65
+		size_hint: (0.35, 0.05)
+        height: '48dp'
 
+    DropDown:
+        id: graph_dropdown
+        on_parent: self.dismiss()
+        on_select: graph_btn.text = '{}'.format(args[1])
+        Button:
+            text: 'Line Graph'
+            size_hint_y: None
+            height: self.parent.parent.parent.button_height
+            on_release: graph_dropdown.select('Line Graph')
+        Button:
+            text: 'Bar Graph'
+            size_hint_y: None
+            height: self.parent.parent.parent.button_height
+            on_release: graph_dropdown.select('Bar Graph')  
+		Button:
+            text: 'Weather Graph'
+            size_hint_y: None
+            height: self.parent.parent.parent.button_height
+            on_release: graph_dropdown.select('Weather Graph')
+        Button:
+            text: 'Smoothed Line Graph'
+            size_hint_y: None
+            height: self.parent.parent.parent.button_height
+            on_release: graph_dropdown.select('Smoothed Line Graph') 
 <DataViewScreen>:
 	name: "display"
 	Label:
-		text: "Data Selection Screen"
+		text: "Data View Screen"
 
 <VisualisationScreen>:
 	name: "screen1"
