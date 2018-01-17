@@ -5,54 +5,90 @@ Created on 9 Jan 2018
 '''
 
 import pandas as pd
+import matplotlib
+matplotlib.use("macosx")
+import os 
+from matplotlib import pyplot as plt
+
+
 
 class Dao:
     
-    def __init__(self):
-        self.stations = {
-        "Aberporth"             : pd.read_csv('stationData/aberporth.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Armagh"                : pd.read_csv('stationData/armagh.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Ballypatrick Forest"   : pd.read_csv('stationData/ballypatrickForest.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Bradford"              : pd.read_csv('stationData/bradford.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Braemar"               : pd.read_csv('stationData/braemar.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Camborne"              : pd.read_csv('stationData/camborne.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Cambridge NIAB"        : pd.read_csv('stationData/cambridgeNIAB.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Cardiff Bute Park"     : pd.read_csv('stationData/cardiffButePark.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Chivenor"              : pd.read_csv('stationData/chivenor.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Cwmystwyth"            : pd.read_csv('stationData/cwmystwyth.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Dunstaffnage"          : pd.read_csv('stationData/dunstaffnage.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Durham"                : pd.read_csv('stationData/durham.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Eastbourne"            : pd.read_csv('stationData/eastbourne.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Eskdalemuir"           : pd.read_csv('stationData/eskdalemuir.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Heathrow"              : pd.read_csv('stationData/heathrow.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Hurn"                  : pd.read_csv('stationData/hurn.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Lerwick"               : pd.read_csv('stationData/lerwick.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Leuchars"              : pd.read_csv('stationData/leuchars.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Lowestoft"             : pd.read_csv('stationData/lowestoft.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Manston"               : pd.read_csv('stationData/manston.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Nairn"                 : pd.read_csv('stationData/nairn.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Newton Rigg"           : pd.read_csv('stationData/newtonRigg.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Oxford"                : pd.read_csv('stationData/oxford.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Paisley"               : pd.read_csv('stationData/paisley.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Ringway"               : pd.read_csv('stationData/ringway.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "RossOnWye"             : pd.read_csv('stationData/rossOnWye.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Shawbury"              : pd.read_csv('stationData/shawbury.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Sheffield"             : pd.read_csv('stationData/sheffield.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Southampton"           : pd.read_csv('stationData/southampton.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Stornoway"             : pd.read_csv('stationData/stornoway.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Sutton Bonington"      : pd.read_csv('stationData/suttonBonington.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Tiree"                 : pd.read_csv('stationData/tiree.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Valley"                : pd.read_csv('stationData/valley.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Waddington"            : pd.read_csv('stationData/waddington.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Whitby"                : pd.read_csv('stationData/whitby.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Wick Airport"          : pd.read_csv('stationData/wickAirport.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python'),
-        "Yeovilton"             : pd.read_csv('stationData/yeovilton.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python')
-        
+    def _loadStationData(self, stationName):
+        return pd.read_csv(self.path +'/stationData/'+ stationName +'.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python')
+    
+    def _createStationDictionary(self):
+        return {
+            "Aberporth"             : self._loadStationData('aberporth'),
+            "Armagh"                : self._loadStationData('armagh'),
+            "Ballypatrick Forest"   : self._loadStationData('ballypatrickForest'),
+            "Bradford"              : self._loadStationData('bradford'),
+            "Braemar"               : self._loadStationData('braemar'),
+            "Camborne"              : self._loadStationData('camborne'),
+            "Cambridge NIAB"        : self._loadStationData('cambridgeNIAB'),
+            "Cardiff Bute Park"     : self._loadStationData('cardiffButePark'),
+            "Chivenor"              : self._loadStationData('chivenor'),
+            "Cwmystwyth"            : self._loadStationData('cwmystwyth'),
+            "Dunstaffnage"          : self._loadStationData('dunstaffnage'),
+            "Durham"                : self._loadStationData('durham'),
+            "Eastbourne"            : self._loadStationData('eastbourne'),
+            "Eskdalemuir"           : self._loadStationData('eskdalemuir'),
+            "Heathrow"              : self._loadStationData('heathrow'),
+            "Hurn"                  : self._loadStationData('hurn'),
+            "Lerwick"               : self._loadStationData('lerwick'),
+            "Leuchars"              : self._loadStationData('leuchars'),
+            "Lowestoft"             : self._loadStationData('lowestoft'),
+            "Manston"               : self._loadStationData('manston'),
+            "Nairn"                 : self._loadStationData('nairn'),
+            "Newton Rigg"           : self._loadStationData('newtonRigg'),
+            "Oxford"                : self._loadStationData('oxford'),
+            "Paisley"               : self._loadStationData('paisley'),
+            "Ringway"               : self._loadStationData('ringway'),
+            "RossOnWye"             : self._loadStationData('rossOnWye'),
+            "Shawbury"              : self._loadStationData('shawbury'),
+            "Sheffield"             : self._loadStationData('sheffield'),
+            "Southampton"           : self._loadStationData('southampton'),
+            "Stornoway"             : self._loadStationData('stornoway'),
+            "Sutton Bonington"      : self._loadStationData('suttonBonington'),
+            "Tiree"                 : self._loadStationData('tiree'),
+            "Valley"                : self._loadStationData('valley'),
+            "Waddington"            : self._loadStationData('waddington'),
+            "Whitby"                : self._loadStationData('whitby'),
+            "Wick Airport"          : self._loadStationData('wickAirport'),
+            "Yeovilton"             : self._loadStationData('yeovilton')
         }
 
-        self.countryStationsMap =  {
+    def __init__(self):
+        # Turn interactive plotting off - found on StackOverflow -> https://stackoverflow.com/questions/15713279/calling-pylab-savefig-without-display-in-ipython
+        plt.ioff()
+        self.path = os.path.abspath(os.path.dirname(__file__))
+        self._stations = self._createStationDictionary()
+        self._countryStationsMap =  {
             "Scotland"          : ["Braemar", "Dunstaffnage", "Eskdalemuir", "Lerwick", "Leuchars", "Nairn", "Paisley", "Stornoway", "Tiree", "Wick Airport"],
             "England"           : ["Bradford", "Camborne", "Cambridge NIAB", "Chivenor", "Durham", "Eastbourne", "Heathrow", "Hurn", "Lowestoft", "Manston", "Newton Rigg", "Oxford", "Ringway", "Shawbury", "Sheffield", "Southampton", "Sutton Bonington", "Waddington", "Whitby", "Yeovilton"],
             "Wales"             : ["Aberporth", "Cardiff Bute Park", "Cwmystwyth", "Ross-On-Wye"],
             "Northern Ireland"  : ["Armagh", "Ballypatrick Forest"]
         }
+        
+    def getRegionNames(self):
+        return ['UK'] + self._countryStationsMap.keys() + self._stations.keys()
+    
+    def getAvailableYearsForRegion(self, regionName):
+        return list(map(lambda x: str(x) , list(set(self._stations.get(regionName)['yyyy'].tolist()))))
+
+    def getAvailableMonthsForRegion(self, regionName, year):
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        return list(map(lambda x: months[x-1], self._stations.get(regionName).loc[self._stations.get(regionName)['yyyy'] == int(year)]['mm'].tolist()))
+    
+    def create_graph(self, details, width, height):
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        df = self._stations.get("Paisley").loc[self._stations.get("Paisley")['yyyy'] == 2008][['mm', 'rain']]
+        fig = plt.figure(figsize=(width/96, height/96)) # sizing found at https://stackoverflow.com/questions/13714454/specifying-and-saving-a-figure-with-exact-size-in-pixels/13714720
+        plt.plot(df['mm'], [float(x) for x in df['rain']])
+        plt.ylabel('Rainfall (mm)')
+        plt.title('Paisley Rainfall')
+        plt.grid(True)
+        plt.savefig(self.path + "/imgs/graph.png")
+        plt.close(fig)
+    
+    

@@ -11,11 +11,9 @@ Config.set('graphics', 'width', '500')
 Config.set('graphics', 'height', '250')
 
 from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.widget import Widget
 from kivy.garden.navigationdrawer import NavigationDrawer
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.dropdown import DropDown
+from kivy.uix.screenmanager import Screen
+from dao import Dao
 
 from visualisation import VisualisationScreen
 
@@ -26,6 +24,7 @@ class Screen3(Screen):
     pass
 
 class Menu(NavigationDrawer):
+    
     def __init__(self):
         super(Menu, self).__init__()
         
@@ -35,6 +34,7 @@ class Menu(NavigationDrawer):
 
 
 class WeatherApp(App):
+    DAO = Dao()
     
     def build(self):
         return Menu()
