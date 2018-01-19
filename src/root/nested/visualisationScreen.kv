@@ -4,7 +4,7 @@
 #:import Factory kivy.factory.Factory
 #:import Window kivy.core.window.Window
 
-#:set spinner_colour 			(0.8, 0.8, 0.8, 1)  	# brown
+#:set spinner_colour 			(0.8, 0.8, 0.8, 1)  		# brown
 #:set spinner_pressed_colour 	(0.659, 0.522, 0.431, 1)  	# darker brown
 #:set spinner_font_colour   	(0, 0, 0, 1) 			 	# black
 
@@ -31,7 +31,7 @@
 		id: screen_manager
 		selection: selection
 		display: display
-		DataSelectScreen:
+		Screen:
 			id: selection
 			name: "selection"
 			layout: layout
@@ -51,13 +51,13 @@
 		    	graph_type: graph_type
 		    	region: region
 		    	start_year: start_year
-		    	start_month: start_month
 		    	end_year: end_year
-		    	end_month: end_month
 		    	time_step: time_step
 		    	interval_step_range_start: interval_step_range_start
 		    	interval_step_range_end: interval_step_range_end
+		    	data_type: data_type
 		    	second_graph: second_graph    
+				
 				Label:
 					pos: 0, self.parent.height * 0.8
 					size_hint: (1, 0.2)
@@ -91,58 +91,41 @@
 		            id: region
 		            text: '<Region>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.49
-		            values: root.screen_manager.selection.regions
-		            on_text: root.screen_manager.selection.updateStartYearSpinner(*args)
+		            values: root.regions
+		            on_text: root.updateStartYearSpinner()
 			            
 				Label:
 					pos: self.parent.width * 0.05, self.parent.height * 0.42
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
-				    text: "Start Month:"
+				    text: "Start Year:"
 				    color: 0, 0, 0, 1
 				
 				MySpinner:
 		            id: start_year
 		            text: 'Year'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.33
-					size_hint: (0.1, 0.08)
+					size_hint: (0.22, 0.08)
 		            values: ['']
 		            disabled: True
-		            on_text: root.screen_manager.selection.updateStartMonthSpinner(*args)
-				  
-				MySpinner:
-		            id: start_month
-		            text: 'Month'
-		            pos: self.parent.width * 0.15, self.parent.height * 0.33
-					size_hint: (0.12, 0.08)
-		            values: ['']
-		            disabled: True
-		            on_text: root.screen_manager.selection.updateEndYearSpinner()
+		            on_text: root.updateEndYearSpinner()
 		                      
 				Label:
 					pos: self.parent.width * 0.3, self.parent.height * 0.42
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
-				    text: "End Month:"
+				    text: "End Year:"
 				    color: 0, 0, 0, 1
 				 
 				MySpinner:
 		            id: end_year
 		            text: 'Year'
 		            pos: self.parent.width * 0.3, self.parent.height * 0.33
-					size_hint: (0.1, 0.08)
+					size_hint: (0.22, 0.08)
 		            values: ['']
-		            disabled: True
-		            on_text: root.screen_manager.selection.updateEndMonthSpinner(*args)
-				  
-				MySpinner:
-		            id: end_month
-		            text: 'Month'
-		            pos: self.parent.width * 0.4, self.parent.height * 0.33
-					size_hint: (0.12, 0.08)
-		            values: ['']
+		            on_text: root.updatePossibleTimeSteps()
 		            disabled: True
 		        
 		        Label:
@@ -158,7 +141,8 @@
 		            text: '<Time Step>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.15
 		            values: ['Month', 'Season', 'Entire Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Anually', 'Summer (Jun - Aug) Anually', 'Autumn (Sep - Nov) Anually', 'Winter (Dec - Feb) Anually', 'Custom Months Annually']  
-					on_text: root.screen_manager.selection.timeStepSelected(*args)
+					on_text: root.timeStepSelected(*args)
+					disabled: True
 					
 				MySpinner:
 		            id: interval_step_range_start
@@ -185,12 +169,12 @@
 				    color: 0, 0, 0, 1 
 				
 				MySpinner:
-		            id: time_step
+		            id: data_type
 		            text: '<Data>'
 		            pos: self.parent.width * 0.55, self.parent.height * 0.64
 					size_hint: (0.4, 0.08)
-		            values: ['Max Temp', 'Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost']  
-				
+		            values: ['Max Temp', 'Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost', 'Total Sun Hours', 'Avg Sun Hours']  
+					on_text: root.updateStartYearSpinner()
 				Label:
 					pos: self.parent.width * 0.55, self.parent.height * 0.49
 					size_hint: (0.4, 0.08)
@@ -204,10 +188,10 @@
 		            text: "x"
 		            pos: self.parent.width * 0.9, self.parent.height * 0.49
 					size_hint: (0.05, 0.08) 
-					background_color: root.screen_manager.selection.unchecked_colour
+					background_color: root.unchecked_colour
 					background_normal: 'imgs/button_img.jpeg'
 					background_down: 'imgs/button_img.jpeg'
-					on_press: root.screen_manager.second_graph_toggled()
+					on_press: root.second_graph_toggled()
 					
 				Button:
 					pos: self.parent.width * 0.55, self.parent.height * 0.05
@@ -216,10 +200,10 @@
 					background_normal: ''
 				    text: "Create and View Graph"
 				    on_press: root.create_graph()
-		DataViewScreen:
+		Screen:
 			id: display
 			name: "display"
-			layout: layout
+			display_layout: display_layout
 			canvas.before:
 		        Color:
 		            rgba: 1, 1, 1, 1
@@ -232,7 +216,7 @@
 			        pos: 0, self.height * 0.8
 		            size: self.width, self.height * 0.2
 		    FloatLayout:   
-		    	id: layout
+		    	id: display_layout
 		    	graph: graph  
 				Label:
 					pos: 0, self.parent.height * 0.8
@@ -245,4 +229,10 @@
 					pos: self.parent.width * 0.1, self.parent.height * -0.1
 					size_hint: (0.9, 1)
 					source: ''
-					
+				Button:
+					text: "<-"
+					pos: 0, self.parent.height * 0.6
+					size_hint: (0.1, 0.2)
+					background_color: [0, 0, 1, 1]
+					background_normal: ''
+					on_press: root.screen_manager.current = "selection"

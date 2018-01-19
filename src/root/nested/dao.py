@@ -5,9 +5,11 @@ Created on 9 Jan 2018
 '''
 
 import pandas as pd
+import numpy as np
 import matplotlib
 matplotlib.use("macosx")
 import os 
+import itertools
 from matplotlib import pyplot as plt
 
 
@@ -15,7 +17,10 @@ from matplotlib import pyplot as plt
 class Dao:
     
     def _loadStationData(self, stationName):
-        return pd.read_csv(self.path +'/stationData/'+ stationName +'.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python')
+        df = pd.read_csv(self.path +'/stationData/'+ stationName +'.txt', sep="\s+|\t+|\s+\t+|\t+\s+", engine='python')
+        df['date'] = pd.to_datetime(df.apply(lambda row: str(row.yyyy) + "-" + str(row.mm), axis=1)) # found at https://kaijento.github.io/2017/04/22/pandas-create-new-column-sum/
+        df.set_index('date', inplace=True)
+        return df
     
     def _createStationDictionary(self):
         return {
@@ -44,7 +49,7 @@ class Dao:
             "Oxford"                : self._loadStationData('oxford'),
             "Paisley"               : self._loadStationData('paisley'),
             "Ringway"               : self._loadStationData('ringway'),
-            "RossOnWye"             : self._loadStationData('rossOnWye'),
+            "Ross-On-Wye"             : self._loadStationData('rossOnWye'),
             "Shawbury"              : self._loadStationData('shawbury'),
             "Sheffield"             : self._loadStationData('sheffield'),
             "Southampton"           : self._loadStationData('southampton'),
@@ -66,27 +71,53 @@ class Dao:
         self._countryStationsMap =  {
             "Scotland"          : ["Braemar", "Dunstaffnage", "Eskdalemuir", "Lerwick", "Leuchars", "Nairn", "Paisley", "Stornoway", "Tiree", "Wick Airport"],
             "England"           : ["Bradford", "Camborne", "Cambridge NIAB", "Chivenor", "Durham", "Eastbourne", "Heathrow", "Hurn", "Lowestoft", "Manston", "Newton Rigg", "Oxford", "Ringway", "Shawbury", "Sheffield", "Southampton", "Sutton Bonington", "Waddington", "Whitby", "Yeovilton"],
-            "Wales"             : ["Aberporth", "Cardiff Bute Park", "Cwmystwyth", "Ross-On-Wye"],
+            "Wales"             : ["Aberporth", "Cardiff Bute Park", "Cwmystwyth", "Ross-On-Wye", "Valley"],
             "Northern Ireland"  : ["Armagh", "Ballypatrick Forest"]
         }
         
     def getRegionNames(self):
         return ['UK'] + self._countryStationsMap.keys() + self._stations.keys()
     
-    def getAvailableYearsForRegion(self, regionName):
-        return list(map(lambda x: str(x) , list(set(self._stations.get(regionName)['yyyy'].tolist()))))
-
-    def getAvailableMonthsForRegion(self, regionName, year):
-        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        return list(map(lambda x: months[x-1], self._stations.get(regionName).loc[self._stations.get(regionName)['yyyy'] == int(year)]['mm'].tolist()))
-    
+    def getAvailableYearsForRegion(self, regionName, data_type):
+        if regionName == "UK":
+            ukList = list(set(list(itertools.chain.from_iterable([self.getAvailableYearsForRegion(x, data_type) for x in self._countryStationsMap.keys()]))))
+            ukList.sort()
+            return ukList
+        elif regionName in self._countryStationsMap.keys():
+            sortedList = list(set(list(itertools.chain.from_iterable([self.getAvailableYearsForRegion(x, data_type) for x in self._countryStationsMap.get(regionName)]))))
+            sortedList.sort()
+            return sortedList
+        else:
+            df = []
+            try:
+                if data_type == "Max Temp" : 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['tmax'] != "---"][['yyyy']]
+                elif data_type == "Min Temp" : 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['tmin'] != "---"][['yyyy']]
+                elif data_type == "Avg Temp" : 
+                    df = self._stations.get(regionName).loc[(self._stations.get(regionName)['tmax'] != "---") | (self._stations.get(regionName)['tmin'] != "---")][['yyyy']]
+                elif data_type == "Air Frost": 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['af'] != "---"][['yyyy']]
+                elif data_type == "Total Rainfall" : 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['rain'] != "---"][['yyyy']]
+                elif data_type == "Avg Rainfall" : 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['rain'] != "---"][['yyyy']]
+                elif data_type == "Total Sun Hours": 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['sun'] != "---"][['yyyy']]
+                else: # "Avg Sun Hours" 
+                    df = self._stations.get(regionName).loc[self._stations.get(regionName)['sun'] != "---"][['yyyy']]
+                years = list(set(df['yyyy'].tolist()))
+            except TypeError:
+                # Reaches here when a column has no missing data
+                df = self._stations.get(regionName)[['yyyy']]
+                years = list(set(df['yyyy'].tolist()))
+            return list(map(lambda x: str(x) , years))
     def create_graph(self, details, width, height):
-        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        df = self._stations.get("Paisley").loc[self._stations.get("Paisley")['yyyy'] == 2008][['mm', 'rain']]
+        df = self._stations.get(details.get("region")).loc[details.get("start_year"):details.get("end_year")][['yyyy', 'mm', 'rain']]
         fig = plt.figure(figsize=(width/96, height/96)) # sizing found at https://stackoverflow.com/questions/13714454/specifying-and-saving-a-figure-with-exact-size-in-pixels/13714720
-        plt.plot(df['mm'], [float(x) for x in df['rain']])
+        plt.plot([pd.to_datetime(str(y) + "-" + str(m)) for y, m in zip(df['yyyy'], df['mm'])], [float(x) if x != "---" else np.NaN for x in df['rain']]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
         plt.ylabel('Rainfall (mm)')
-        plt.title('Paisley Rainfall')
+        plt.title(details.get('region') + ' ' + details.get('data_type'))
         plt.grid(True)
         plt.savefig(self.path + "/imgs/graph.png")
         plt.close(fig)
