@@ -71,6 +71,7 @@ class VisualisationScreen(Screen):
             self.screen_manager.selection.layout.second_graph.background_color = self.unchecked_colour
             self.screen_manager.selection.layout.second_graph.text = 'x'
             
+            
     def create_graph(self):
         details = {}
         graph_type = self.screen_manager.selection.layout.graph_type.text

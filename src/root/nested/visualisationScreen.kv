@@ -140,7 +140,7 @@
 		            id: time_step
 		            text: '<Time Step>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.15
-		            values: ['Month', 'Season', 'Entire Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Anually', 'Summer (Jun - Aug) Anually', 'Autumn (Sep - Nov) Anually', 'Winter (Dec - Feb) Anually', 'Custom Months Annually']  
+		            values: ['Month', 'Season', 'Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Anually', 'Summer (Jun - Aug) Anually', 'Autumn (Sep - Nov) Anually', 'Winter (Dec - Feb) Anually', 'Custom Months Annually']  
 					on_text: root.timeStepSelected(*args)
 					disabled: True
 					
@@ -173,7 +173,7 @@
 		            text: '<Data>'
 		            pos: self.parent.width * 0.55, self.parent.height * 0.64
 					size_hint: (0.4, 0.08)
-		            values: ['Max Temp', 'Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost', 'Total Sun Hours', 'Avg Sun Hours']  
+		            values: ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
 					on_text: root.updateStartYearSpinner()
 				Label:
 					pos: self.parent.width * 0.55, self.parent.height * 0.49
