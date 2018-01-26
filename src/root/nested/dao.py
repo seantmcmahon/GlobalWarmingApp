@@ -7,6 +7,7 @@ Created on 9 Jan 2018
 import pandas as pd
 import numpy as np
 import matplotlib
+from pygments.unistring import combine
 matplotlib.use("macosx")
 import os 
 import itertools
@@ -160,15 +161,53 @@ class Dao:
         df = table.loc[table['mm'] == month][['yyyy', value]]
         return df
     
-    def total_season_every_year(self, table, value, season):
+    def total_month_range_every_year(self, table, value, operation, month_range):
+        valueTable = table.loc[table['mm'].isin(month_range)][['yyyy', value]]
+        df = valueTable.groupby('yyyy')[value].apply(list)
+        summedValues = []
+        for x in df.tolist():
+            if operation == "avg":
+                summedValues.append(sum([float(y) for y in x if y != "---"]) / len([float(y) for y in x if y != "---"]))
+            else:
+                summedValues.append(operation([float(y) for y in x if y != "---"]))
+        years = valueTable["yyyy"].unique().tolist()
+        table = pd.DataFrame({"yyyy": years, value: summedValues})
+        return table[['yyyy', value]]
+    
+    def group_by_seasons(self, table, value, operation):
+        combined = pd.concat([self.total_season_every_year(table, value, operation, x) for x in ["Spring", "Summer", "Autumn", "Winter"]])
+        combined.sort_index(inplace=True)
+        return combined[['time', value]]
+    
+    def total_season_every_year(self, table, value, operation, season):
         seasons = {
             "Spring": [3,4,5],
             "Summer": [6,7,8],
             "Autumn": [9,10,11],
             "Winter": [12, 1, 2]
-            }
-        # df = table.loc[table['mm'] == month][['yyyy', value]]
-        # return df
+        }
+        months = seasons.get(season)
+        df = table.loc[(table['mm'] == months[0]) | (table['mm'] == months[1]) | (table['mm'] == months[2])]
+        
+        if season == "Winter":
+            # Winter cross over into the next year so bring jan and feb values into same year as dec
+            df['yyyy'] = df.apply(lambda row: str(int(row['yyyy']) - 1) if int(row['mm']) != 12 else str(row['yyyy']), axis=1)
+            
+        df = self.total_values_by_year(df, value, operation)
+        df['mm'] = pd.Series(months[0], index=df.index)
+        
+        df['time'] = pd.to_datetime(df.apply(lambda row: str(int(row.yyyy)) + "-" + str(int(row.mm)), axis=1))
+        df = self.setDFIndex(df)
+        df.sort_index(inplace=True)
+        return df[['time', value]]
+    
+    def average_two_columns(self, col1, col2):
+        avgs = []
+        print col1
+        print col2
+        for x, y in zip(col1, col2):
+            avgs.append((float(x) + float(y)) / 2)
+        return avgs
     
     def get_table(self, region, value, operation):
         if region == "UK":
@@ -181,19 +220,20 @@ class Dao:
     def group_data_by_time_step(self, df, timeStep, value, operation, monthRange=None):
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         seasons = ["Spring", "Summer", "Autumn", "Winter"]
+        print re.sub(r" (.*) Annually", '', timeStep)
         print timeStep
         if timeStep == "Month":
             return self.total_values_by_month(df, value)
         elif timeStep == "Season":
-            pass
+            return self.group_by_seasons(df, value, operation)
         elif timeStep == "Entire Year":
             return self.total_values_by_year(df, value, operation)
         elif timeStep.replace(" Annually", '') in months:
             return self.total_month_every_year(df, value, timeStep.replace(" Annually", ''))
-        elif timeStep.replace(" Annually", '') in seasons:
-            pass
+        elif re.sub(r" (.*) Annually", '', timeStep) in seasons:
+            return self.total_season_every_year(df, value, operation, re.sub(r" (.*) Annually", '', timeStep))
         else: # Custom Month Range
-            pass
+            return self.total_month_range_every_year(df, value, operation, monthRange)
     
     def create_graph(self, details, width, height):
         regionName = details.get("region")
@@ -216,11 +256,29 @@ class Dao:
                                               .loc[details.get("start_year"):details.get("end_year")],
                                                details.get("time_step"), 
                                                graphDetails.get(data_type).get("value"),
-                                               graphDetails.get(data_type).get("operation"))
+                                               graphDetails.get(data_type).get("operation"), 
+                                               details.get("month_range"))
             plt.plot([pd.to_datetime(str(x)) for x in df[df.columns[0]]], [float(x) if x != "---" else np.NaN for x in df[graphDetails.get(data_type).get("value")]]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
             plt.ylabel(graphDetails.get(data_type).get("label"))
         else: # Avg temp
-            pass
+            maxi = self.group_data_by_time_step(self.get_table(regionName, "tmax", max)
+                                              .loc[details.get("start_year"):details.get("end_year")],
+                                               details.get("time_step"), 
+                                               "tmax",
+                                               max, 
+                                               details.get("month_range"))
+            mini = self.group_data_by_time_step(self.get_table(regionName, "tmin", min)
+                                              .loc[details.get("start_year"):details.get("end_year")],
+                                               details.get("time_step"), 
+                                               "tmin",
+                                               min, 
+                                               details.get("month_range"))
+            avgs = self.average_two_columns(maxi['tmax'].tolist(), mini['tmin'].tolist())
+            print maxi[maxi.columns[0]]
+            print [pd.to_datetime(str(x)) for x in maxi[maxi.columns[0]]]
+            print [float(x) if x != "---" else np.NaN for x in avgs]
+            plt.plot([pd.to_datetime(str(x)) for x in maxi[maxi.columns[0]]], [float(x) if x != "---" else np.NaN for x in avgs]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
+            plt.ylabel("Avg Temps (deg. C)")
         plt.title(regionName + ' ' + data_type)
         plt.grid(True)
         plt.savefig(self.path + "/imgs/graph.png")

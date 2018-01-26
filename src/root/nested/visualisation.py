@@ -42,8 +42,8 @@ class VisualisationScreen(Screen):
     def updatePossibleTimeSteps(self):
         full_selection = ['Month', 'Season', 'Entire Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 
                           'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 
-                          'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Anually', 'Summer (Jun - Aug) Anually', 
-                          'Autumn (Sep - Nov) Anually', 'Winter (Dec - Feb) Anually', 'Custom Months Annually']
+                          'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Annually', 'Summer (Jun - Aug) Annually', 
+                          'Autumn (Sep - Nov) Annually', 'Winter (Dec - Feb) Annually', 'Custom Months Annually']
         start_year = self.screen_manager.selection.layout.start_year.text
         end_year = self.screen_manager.selection.layout.end_year.text
         self.screen_manager.selection.layout.time_step.disabled = False
@@ -83,8 +83,10 @@ class VisualisationScreen(Screen):
         details["end_year"] = self.screen_manager.selection.layout.end_year.text
         details["time_step"] = self.screen_manager.selection.layout.time_step.text
         if self.screen_manager.selection.layout.time_step.text == "Custom Months Annually":
-            details["interval_start"] = self.screen_manager.selection.layout.interval_step_range_start.text
-            details["interval_end"] = self.screen_manager.selection.layout.interval_step_range_end.text
+            start = self.screen_manager.selection.layout.interval_step_range_start.text
+            end = self.screen_manager.selection.layout.interval_step_range_end.text
+            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            details["month_range"] = range(int(months.index(start))+1, int(months.index(end))+2)
         
         self.dao.create_graph(details, Window.size[0], Window.size[1])
         self.screen_manager.display.display_layout.graph.source = 'imgs/graph.png'
