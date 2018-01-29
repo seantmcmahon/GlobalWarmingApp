@@ -4,12 +4,10 @@ Created on 26 Dec 2017
 @author: seantmcmahon
 '''
 import kivy
-from pygments.lexers import graph
 kivy.require('1.9.1')
 
 from kivy.lang import Builder 
 from kivy.app import App
-from kivy.properties import ListProperty
 from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 
@@ -74,10 +72,10 @@ class VisualisationScreen(Screen):
             
     def create_graph(self):
         details = {}
-        graph_type = self.screen_manager.selection.layout.graph_type.text
-        details['graph_type'] = graph_type
-        if graph_type != "Weather Graph" :
-            details['data_type'] = self.screen_manager.selection.layout.data_type.text
+        #graph_type = self.screen_manager.selection.layout.graph_type.text
+        #details['graph_type'] = graph_type
+        #if graph_type != "Weather Graph" :
+        details['data_type'] = self.screen_manager.selection.layout.data_type.text
         details["region"] = self.screen_manager.selection.layout.region.text
         details["start_year"] = self.screen_manager.selection.layout.start_year.text
         details["end_year"] = self.screen_manager.selection.layout.end_year.text
@@ -89,5 +87,8 @@ class VisualisationScreen(Screen):
             details["month_range"] = range(int(months.index(start))+1, int(months.index(end))+2)
         
         self.dao.create_graph(details, Window.size[0], Window.size[1])
+        self.screen_manager.display.display_layout.graph.source = ''
+        self.screen_manager.display.display_layout.graph.reload()
         self.screen_manager.display.display_layout.graph.source = 'imgs/graph.png'
+        self.screen_manager.display.display_layout.graph.reload()
         self.screen_manager.current = "display"

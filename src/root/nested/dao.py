@@ -258,6 +258,7 @@ class Dao:
                                                graphDetails.get(data_type).get("value"),
                                                graphDetails.get(data_type).get("operation"), 
                                                details.get("month_range"))
+            print df
             plt.plot([pd.to_datetime(str(x)) for x in df[df.columns[0]]], [float(x) if x != "---" else np.NaN for x in df[graphDetails.get(data_type).get("value")]]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
             plt.ylabel(graphDetails.get(data_type).get("label"))
         else: # Avg temp
