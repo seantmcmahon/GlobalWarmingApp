@@ -1,0 +1,179 @@
+#!text
+#:kivy 1.9.1
+#:import sm kivy.uix.screenmanager
+
+<ForecastingScreen>:
+	name: "screen3"
+	screen_manager: screen_manager
+	ScreenManager:
+		id: screen_manager
+		selection: selection
+		display: display
+		Screen:
+			id: selection
+			name: "selection"
+			layout: layout
+			canvas.before:
+		        Color:
+		            rgba: 1, 1, 1, 1
+		        Rectangle:
+		            pos: self.pos
+		            size: self.size
+		        Color:
+					rgba: [0.77, 0.15, 0.15, 1]
+				Rectangle:
+			        pos: 0, self.height * 0.8
+		            size: self.width, self.height * 0.2
+		    FloatLayout:   
+		    	id: layout
+#		    	graph_type: graph_type
+		    	region: region
+		    	prediction_type: prediction_type
+		    	time_step: time_step
+		    	interval_step_range_start: interval_step_range_start
+		    	interval_step_range_end: interval_step_range_end
+		    	data_type: data_type 
+		    	view_steps: view_steps  
+				
+				Label:
+					pos: 0, self.parent.height * 0.8
+					size_hint: (1, 0.2)
+				    text: "PREDICT FUTURE/PAST DATA"
+				    halign: "center"
+				    color: 1, 1, 1, 1
+				        
+		        Label:
+					pos: self.parent.width * 0.05, self.parent.height * 0.57
+					size_hint: (0.22, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Region:"
+				    color: 0, 0, 0, 1
+				    
+				MySpinner:
+		            id: region
+		            text: '<Region>'
+		            pos: self.parent.width * 0.05, self.parent.height * 0.49
+		            values: root.regions
+			            
+				Label:
+					pos: self.parent.width * 0.05, self.parent.height * 0.42
+					size_hint: (0.47, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Data to predict:"
+				    color: 0, 0, 0, 1
+				
+				MySpinner:
+		            id: prediction_type
+		            text: '<Select>'
+		            pos: self.parent.width * 0.05, self.parent.height * 0.33
+		            values: ['Future Values', 'Past Values', 'Predict Both']
+		        
+		        Label:
+					pos: self.parent.width * 0.05, self.parent.height * 0.25
+					size_hint: (0.2, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Predict By:"
+				    color: 0, 0, 0, 1 
+				
+				MySpinner:
+		            id: time_step
+		            text: '<Time Step>'
+		            pos: self.parent.width * 0.05, self.parent.height * 0.15
+		            values: ['Month', 'Season', 'Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Annually', 'Summer (Jun - Aug) Annually', 'Autumn (Sep - Nov) Annually', 'Winter (Dec - Feb) Annually', 'Custom Months Annually']  
+					on_text: root.timeStepSelected(*args)
+					
+				MySpinner:
+		            id: interval_step_range_start
+		            text: '<Month>'
+		            pos: self.parent.width * 0.05, self.parent.height * 0.05
+					size_hint: (0.22, 0.08)
+		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		        	disabled: True
+		        	
+		        MySpinner:
+		            id: interval_step_range_end
+		            text: '<Month>'
+		            pos: self.parent.width * 0.3, self.parent.height * 0.05
+					size_hint: (0.22, 0.08)
+		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		        	disabled: True
+		        	
+		        Label:
+					pos: self.parent.width * 0.55, self.parent.height * 0.73
+					size_hint: (0.4, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Data Used:"
+				    color: 0, 0, 0, 1 
+				
+				MySpinner:
+		            id: data_type
+		            text: '<Data>'
+		            pos: self.parent.width * 0.55, self.parent.height * 0.64
+					size_hint: (0.4, 0.08)
+		            values: ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
+				
+				Label:
+					pos: self.parent.width * 0.55, self.parent.height * 0.49
+					size_hint: (0.4, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "View Forecasting Steps:"
+				    color: 0, 0, 0, 1
+					            
+			    ToggleButton
+			    	id: view_steps
+		            text: "x"
+		            pos: self.parent.width * 0.9, self.parent.height * 0.49
+					size_hint: (0.05, 0.08) 
+					background_color: root.unchecked_colour
+					background_normal: 'imgs/button_img.jpeg'
+					background_down: 'imgs/button_img.jpeg'					
+					on_press: root.view_steps_toggled()
+				
+				Button:
+					pos: self.parent.width * 0.55, self.parent.height * 0.05
+					size_hint: (0.4, 0.18)
+					background_color: [0.2, 0.2, 0.77, 1]
+					background_normal: ''
+				    text: "Predict and View Data"
+				    on_press: root.predict_data()
+		Screen:
+			id: display
+			name: "display"
+			display_layout: display_layout
+			canvas.before:
+		        Color:
+		            rgba: 1, 1, 1, 1
+		        Rectangle:
+		            pos: self.pos
+		            size: self.size
+		        Color:
+					rgba: [0.77, 0.15, 0.15, 1]
+				Rectangle:
+			        pos: 0, self.height * 0.8
+		            size: self.width, self.height * 0.2
+		    FloatLayout:   
+		    	id: display_layout
+		    	graph: graph  
+				Label:
+					pos: 0, self.parent.height * 0.8
+					size_hint: (1, 0.2)
+				    text: "PREDICTED DATA"
+				    halign: "center"
+				    color: 1, 1, 1, 1
+				Image:
+					id: graph
+					pos: self.parent.width * 0.1, self.parent.height * -0.1
+					size_hint: (0.9, 1)
+					source: ''
+				Button:
+					text: "<-"
+					pos: 0, self.parent.height * 0.6
+					size_hint: (0.1, 0.2)
+					background_color: [0, 0, 1, 1]
+					background_normal: ''
+					on_press: root.screen_manager.current = "selection"

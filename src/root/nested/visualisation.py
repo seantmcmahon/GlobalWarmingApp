@@ -9,7 +9,6 @@ kivy.require('1.9.1')
 from kivy.lang import Builder 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
-from kivy.core.window import Window
 
 Builder.load_file('visualisationScreen.kv')
 
@@ -38,7 +37,7 @@ class VisualisationScreen(Screen):
         self.screen_manager.selection.layout.end_year.values = self.dao.getAvailableYearsForRegion(region, data_type)
         
     def updatePossibleTimeSteps(self):
-        full_selection = ['Month', 'Season', 'Entire Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 
+        full_selection = ['Month', 'Season', 'Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 
                           'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 
                           'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Annually', 'Summer (Jun - Aug) Annually', 
                           'Autumn (Sep - Nov) Annually', 'Winter (Dec - Feb) Annually', 'Custom Months Annually']
@@ -86,7 +85,7 @@ class VisualisationScreen(Screen):
             months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
             details["month_range"] = range(int(months.index(start))+1, int(months.index(end))+2)
         
-        self.dao.create_graph(details, Window.size[0], Window.size[1])
+        self.dao.create_graph(details, 500, 250)
         self.screen_manager.display.display_layout.graph.source = ''
         self.screen_manager.display.display_layout.graph.reload()
         self.screen_manager.display.display_layout.graph.source = 'imgs/graph.png'

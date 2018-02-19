@@ -6,6 +6,7 @@ Created on 9 Jan 2018
 import unittest
 import itertools
 import sys
+import numpy as np
 # Add the ptdraft folder path to the sys.path list
 sys.path.append('../')
 from dao import Dao
@@ -67,30 +68,107 @@ class TestDao(unittest.TestCase):
         self.assertEquals(self.dao.getAvailableYearsForRegion('UK', "Total Rainfall")[-1], '2016')
         self.assertEquals(self.dao.getAvailableYearsForRegion('UK', "Sun hours")[0], '1890')
         self.assertEquals(self.dao.getAvailableYearsForRegion('UK', "Sun hours")[-1], '2016')
-        
-    def test_prepare_values_for_display(self):
-        self.assertEquals(self.dao.prepare_values_for_display(["118.6*", "173.8"]), [118.6, 173.8])
-        
-    def test_get_avg_temps(self):
-        temps = [('5.0', '-1.4'),('7.3', '1.9'),('6.2', '0.3'),('8.6', '2.1'),('15.8', '7.7'),
-                 ('17.7', '8.7'),('18.9', '11.0'),('17.5', '9.7'),('16.3', '8.4'),
-                 ('14.6', '8.0'),('9.6', '3.4'),('5.8', '0.0')]
-        self.assertEquals(self.dao.get_avg_temps(temps), [1.8, 4.6, 3.25, 5.35, 11.75, 13.2, 14.95, 13.6, 12.35, 11.3, 6.5, 2.9])
+           
+    def test_average_two_columns(self):
+        col1 = ['5.0','7.3','6.2','8.6','15.8','17.7','18.9','17.5','16.3','14.6','9.6','5.8']
+        col2 = ['-1.4','1.9','0.3','2.1','7.7','8.7','11.0','9.7','8.4','8.0','3.4','0.0']
+        expectedResults = [1.8, 4.6, 3.25, 5.35, 11.75, 13.2, 14.95, 13.6, 12.35, 11.3, 6.5, 2.9]
+        actualResults = self.dao.average_two_columns(col1, col2)
+        for x in range(len(expectedResults)):
+            self.assertAlmostEquals(expectedResults[x], actualResults[x])
 
     def test_total_values_by_year(self):
-        self.assertEquals(self.dao.total_values_by_year(self.dao._stations.get("Aberporth").head(36), "rain")["rain"].tolist(), [786.9, 962.0, 992.5])
+        self.assertEquals(self.dao.total_values_by_year(self.dao._stations.get("Aberporth").head(36), "rain", sum)["rain"].tolist(), [786.9, 962.0, 992.5])
      
     def test_get_combined_table_for_country(self):
-        self.assertAlmostEquals(self.dao.get_combined_table_for_country("Northern Ireland", "rain")["rain"].tolist()[0], 57.3)
-        self.assertAlmostEquals(self.dao.get_combined_table_for_country("Northern Ireland", "rain")["rain"].tolist()[-1], 131.4)
+        self.assertAlmostEquals(self.dao.get_combined_table_for_country("Northern Ireland", "rain", sum)["rain"].tolist()[0], 57.3)
+        self.assertAlmostEquals(self.dao.get_combined_table_for_country("Northern Ireland", "rain", sum)["rain"].tolist()[-1], 131.4)
         
     def test_get_combined_table_for_uk(self):
-        self.assertAlmostEquals(self.dao.get_combined_table_for_uk("rain")["rain"].tolist()[0], 120.1)
-        self.assertAlmostEquals(self.dao.get_combined_table_for_uk("rain")["rain"].tolist()[-1], 1950)
+        self.assertAlmostEquals(self.dao.get_combined_table_for_uk("rain", sum)["rain"].tolist()[0], 120.1)
+        self.assertAlmostEquals(self.dao.get_combined_table_for_uk("rain", sum)["rain"].tolist()[-1], 1950)
       
-    #def test_group_values_by_season(self):
-    #    self.assertEquals(self.dao.group_values_by_season(self.dao._stations.get("Aberporth")[['yyyy', 'mm', 'rain']], 'rain'), [("1941-Winter", 71.9), ("1941-Spring", 53.7333333), ("1941-Summer", 57.1333333), ("1941-Autumn", 74.6666667)])
-
+    def test_total_values_by_month(self):
+        values = ["tmax", "tmin", "af", "rain", "sun"]
+        for station in self.dao._stations.keys():
+            for v in values:
+                table = self.dao.get_table(station, v, None)
+                for row in table[v].tolist():
+                    try:
+                        self.assertTrue(isinstance(row, float))
+                    except AssertionError:
+                        self.assertEquals(row, "---")
+    
+    def test_get_combined_table_for_country_all_float_or_NaN(self):
+        values = ["tmax", "tmin", "af", "rain", "sun"]
+        for country in self.dao._countryStationsMap.keys():
+            for v in values:
+                table = self.dao.get_table(country, v, max)
+                for row in table[v].tolist():
+                    try:
+                        self.assertTrue(isinstance(row, float))
+                    except AssertionError:
+                        self.assertTrue(row in ["---", np.NaN])
+    
+    def test_get_combined_table_for_uk_all_float_or_NaN(self):
+        values = ["tmax", "tmin", "af", "rain", "sun"]
+        for v in values:
+            table = self.dao.get_table("UK", v, max)
+            for row in table[v].tolist():
+                try:
+                    self.assertTrue(isinstance(row, float))
+                except AssertionError:
+                    self.assertTrue(row in ["---", np.NaN])
+                    
+    def test_all_possible_graph_combinations(self):
+        regions = self.dao.getRegionNames()
+        data_types = ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']
+        time_steps = ['Month', 'Season', 'Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 
+                          'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 
+                          'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Annually', 'Summer (Jun - Aug) Annually', 
+                          'Autumn (Sep - Nov) Annually', 'Winter (Dec - Feb) Annually', 'Custom Months Annually']
+        numGraphs = 1
+        for region in regions:
+            for data_type in data_types:
+                years = self.dao.getAvailableYearsForRegion(region, data_type)
+                for i in years:
+                    for j in years[years.index(i):]:
+                        if i == j:
+                            for time in ['Month', 'Season']:
+                                try:
+                                    details = {"data_type": data_type, "region": region, "start_year": i, "end_year": j, "time_step": time}
+                                    self.dao.create_graph(details, 500, 250) 
+                                    print numGraphs, "graphs made"
+                                    numGraphs = numGraphs +1
+                                except Exception as e:
+                                    print e
+                                    print region, data_type, i, j, time
+                                    self.fail("Error raised unexpectedly")  
+                        else:
+                            for time in time_steps:
+                                if time == 'Custom Months Annually':
+                                    for a in range(0, 12):
+                                        for b in range(a, 13):
+                                            try:
+                                                details = {"data_type": data_type, "region": region, "start_year": i, "end_year": j, "time_step": time, "month_range": range(a+1, b+2)}
+                                                self.dao.create_graph(details, 500, 250)
+                                                print numGraphs, "graphs made"
+                                                numGraphs = numGraphs +1
+                                            except Exception as e:
+                                                print e
+                                                print region, data_type, i, j, time, a, b
+                                                self.fail("Error raised unexpectedly")
+                                else:
+                                    try:
+                                        details = {"data_type": data_type, "region": region, "start_year": i, "end_year": j, "time_step": time}
+                                        self.dao.create_graph(details, 500, 250)
+                                        print numGraphs, "graphs made"
+                                        numGraphs = numGraphs +1 
+                                    except Exception as e:
+                                        print e
+                                        print region, data_type, i, j, time
+                                        self.fail("Error raised unexpectedly")
+            
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

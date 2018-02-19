@@ -6,21 +6,15 @@ Created on 7 Dec 2017
 import kivy
 kivy.require('1.9.1')
 
-from kivy.config import Config
-Config.set('graphics', 'width', '500')
-Config.set('graphics', 'height', '250')
-
 from kivy.app import App
 from kivy.garden.navigationdrawer import NavigationDrawer
 from kivy.uix.screenmanager import Screen
 from dao import Dao
 
 from visualisation import VisualisationScreen
+from forecasting import ForecastingScreen
 
 class Screen2(Screen):
-    pass
-
-class Screen3(Screen):
     pass
 
 class Menu(NavigationDrawer):

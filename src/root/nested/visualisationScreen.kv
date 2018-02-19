@@ -2,7 +2,6 @@
 #:kivy 1.9.1
 #:import sm kivy.uix.screenmanager
 #:import Factory kivy.factory.Factory
-#:import Window kivy.core.window.Window
 
 #:set spinner_colour 			(0.8, 0.8, 0.8, 1)  		# brown
 #:set spinner_pressed_colour 	(0.659, 0.522, 0.431, 1)  	# darker brown
@@ -14,7 +13,7 @@
     background_down: 'imgs/button_img.jpeg'
     background_normal: 'imgs/button_img.jpeg'
     color: spinner_font_colour
-    height: Window.size[1] * 0.08
+    height: 20
 
 <MySpinner@Spinner>:
     background_color: spinner_colour if self.state == 'normal' else spinner_pressed_colour
