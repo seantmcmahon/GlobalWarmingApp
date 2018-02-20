@@ -26,14 +26,12 @@
 		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: layout
-#		    	graph_type: graph_type
 		    	region: region
 		    	prediction_type: prediction_type
 		    	time_step: time_step
 		    	interval_step_range_start: interval_step_range_start
 		    	interval_step_range_end: interval_step_range_end
-		    	data_type: data_type 
-		    	view_steps: view_steps  
+		    	data_type: data_type  
 				
 				Label:
 					pos: 0, self.parent.height * 0.8
@@ -102,7 +100,7 @@
 		        	disabled: True
 		        	
 		        Label:
-					pos: self.parent.width * 0.55, self.parent.height * 0.73
+					pos: self.parent.width * 0.05, self.parent.height * 0.73
 					size_hint: (0.4, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -112,27 +110,8 @@
 				MySpinner:
 		            id: data_type
 		            text: '<Data>'
-		            pos: self.parent.width * 0.55, self.parent.height * 0.64
-					size_hint: (0.4, 0.08)
+		            pos: self.parent.width * 0.05, self.parent.height * 0.64
 		            values: ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
-				
-				Label:
-					pos: self.parent.width * 0.55, self.parent.height * 0.49
-					size_hint: (0.4, 0.08)
-					text_size: self.size
-					halign: "left"
-				    text: "View Forecasting Steps:"
-				    color: 0, 0, 0, 1
-					            
-			    ToggleButton
-			    	id: view_steps
-		            text: "x"
-		            pos: self.parent.width * 0.9, self.parent.height * 0.49
-					size_hint: (0.05, 0.08) 
-					background_color: root.unchecked_colour
-					background_normal: 'imgs/button_img.jpeg'
-					background_down: 'imgs/button_img.jpeg'					
-					on_press: root.view_steps_toggled()
 				
 				Button:
 					pos: self.parent.width * 0.55, self.parent.height * 0.05

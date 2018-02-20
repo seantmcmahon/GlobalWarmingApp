@@ -8,7 +8,7 @@ Class follows example code found at https://www.analyticsvidhya.com/blog/2016/02
 '''
 
 import pandas as pd
-import numpy as np
+#import numpy as np
 import os
 import itertools
 import matplotlib
@@ -51,36 +51,42 @@ class Predictor:
                 bestModel = x
         return bestModel
             
-    def predict(self, ts, p, d, q):
+    def predict(self, ts, p, d, q, predict_type="Future Values", predict_start=2016):
         X = ts.values
         size = int(len(X) * 0.66)
         train, test = X[0:size], X[size:len(X)]
-        history = [x for x in train]
+        history = [float(x) for x in train]
         predictions = list()
         model = None
         model_fit = None
         #model existing data
         for t in range(len(test)):
-            model = ARIMA(history, order=(0,1,1))
+            model = ARIMA(history, order=(p,d,q))
             model_fit = model.fit(disp=0)
             output = model_fit.forecast()
             yhat = output[0]
             predictions.append(yhat)
-            obs = test[t]
+            obs = float(test[t])
             history.append(obs)
         #model future data
         for t in range(20):
-            model = ARIMA(history, order=(0,1,1))
+            model = ARIMA(history, order=(p,d,q))
             model_fit = model.fit(disp=0)
             output = model_fit.forecast()
             yhat = output[0]
             predictions.append(yhat)
             history.append(yhat)
-        preds = [np.nan for x in range(len(ts) - (len(predictions)-20))]
+        preds = [float("nan") for x in range(len(ts) - (len(predictions)-20))]
         forecast = preds + [x[0] for x in predictions]
         df = pd.DataFrame({"orig": ts.iloc[:,0], "forecast": forecast[:-20]})
-        data = [pd.to_datetime("01-01-"+str(2016+x)) for x in range(20)]
-        orig = [np.nan for x in range(20)]
+        data = []
+        if predict_type == "Future Values":
+            data = [pd.to_datetime("01-01-"+str(2016+x)) for x in range(20)]
+        else:
+            data = [pd.to_datetime("01-01-"+str(predict_start-x)) for x in range(20)]
+            print "forecast years: ", data
+            
+        orig = [float("nan") for x in range(20)]
         futures = forecast[-20:]
         df2 = pd.DataFrame({"orig": orig, "forecast": futures, "ind": data})
         df2.set_index("ind", inplace=True)
@@ -91,13 +97,8 @@ class Predictor:
             if not math.isnan(forecast[x]):
                 index = x
                 break
-            
-        # plot
-        fig = plt.figure(figsize=(5, 2))
-        plt.plot(df[['orig']].iloc[index:], color='red')
-        plt.plot(df[['forecast']].iloc[index:], color='green')
-        plt.savefig(self.path + "/imgs/newModel.png")
-        plt.close(fig)
+        
+        return (df[['orig']].iloc[index:], df[['forecast']].iloc[index:])    
         
     def predict_future_values(self):
         pass
@@ -112,9 +113,30 @@ class Predictor:
         times, ts = self.dao.retrieve_data(params)
         ts = pd.DataFrame({"ts": ts, "times": times})
         ts.set_index("times", inplace= True)
-        #(p, d, q) = self.getBestFitModel(ts)
-        #self.predict(ts, p, d, q)
-        self.predict(ts, 0, 1, 1)
+        try:
+            ts = ts[ts['ts'] != "nan"]
+        except:
+            pass
+        if params["prediction_type"] == "Past Values":
+            ts = ts.iloc[::-1]
+        (p, d, q) = self.getBestFitModel(ts.iloc[-60:])
+        (current, forecast) = (None, None)
+        if params['prediction_type'] == "Past Values":
+            start = self.dao.getAvailableYearsForRegion(params['region'], params['data_type'])
+            print "Start year: ", start[0]
+            (current, forecast) = self.predict(ts, p, d, q, predict_type="Past Values",predict_start=int(start[0]))
+        else:
+            (current, forecast) = self.predict(ts, p, d, q)
+        print forecast
+        print p,d,q
+        # plot
+        fig = plt.figure(figsize=(5, 2))
+        plt.plot(current, color='red')
+        plt.plot(forecast, color='green')
+        plt.ylabel(params['data_type'])
+        plt.title("Forecast: " + params['region'] + " " + params['prediction_type'])
+        plt.savefig(self.path + "/imgs/newModel.png")
+        plt.close(fig)
         
     def __init__(self, dao):
         self.dao = dao 

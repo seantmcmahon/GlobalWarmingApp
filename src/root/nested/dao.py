@@ -5,7 +5,7 @@ Created on 9 Jan 2018
 '''
 
 import pandas as pd
-import numpy as np
+#import numpy as np
 import matplotlib
 matplotlib.use("macosx")
 import os 
@@ -118,9 +118,9 @@ class Dao:
         values = [x for x in table.groupby(groupingColumns)[value].apply(list)]
         months = [x[0] for x in table.groupby(groupingColumns)['mm'].apply(list)]
         if operation == "avg":
-            values = [sum(x) / len(x) if x != [] else np.NaN for x in values]
+            values = [sum(x) / len(x) if x != [] else "nan" for x in values]
         else:
-            values = [operation(x) if x != [] else np.NaN for x in values ]
+            values = [operation(x) if x != [] else "nan" for x in values ]
         df = pd.DataFrame({'yyyy': years, 'mm': months, value: values})
         df = self.setDFIndex(df)
         return df
@@ -142,11 +142,10 @@ class Dao:
     
     def total_values_by_year(self, valueTable, value, operation):  
         df = valueTable.groupby('yyyy')[value].apply(list)
-        print df.tolist()
         summedValues = []
         for x in df.tolist():
             if self.remove_NaNs(x) == []:
-                summedValues.append(np.NaN)
+                summedValues.append("nan")
             elif operation == "avg":
                 summedValues.append(sum(x) / len(x))
             else:
@@ -196,7 +195,6 @@ class Dao:
         if season == "Winter":
             # Winter crosses over into the next year so bring Jan and Feb values into same year as Dec
             df['yyyy'] = df.apply(lambda row: str(int(row['yyyy']) - 1) if int(row['mm']) != 12 else str(int(row['yyyy'])), axis=1)  
-        print df
         df = self.total_values_by_year(df, value, operation)
         df['mm'] = pd.Series(months[0], index=df.index)
         df['time'] = pd.to_datetime(df.apply(lambda row: str(int(float(row.yyyy))) + "-" + str(int(row.mm)), axis=1))
@@ -217,7 +215,7 @@ class Dao:
             return self.get_combined_table_for_country(region, value, operation)
         else:
             df = self._stations.get(region)[['yyyy', 'mm', value]]
-            df[value] = df[value].apply(lambda x: float(re.sub('[^0-9\.-]', '', str(x))) if x != "---"  else np.NaN)
+            df[value] = df[value].apply(lambda x: float(re.sub('[^0-9\.-]', '', str(x))) if x != "---"  else "nan")
             return df
         
     def group_data_by_time_step(self, df, timeStep, value, operation, monthRange=None):
@@ -259,7 +257,6 @@ class Dao:
                                                graphDetails.get(data_type).get("value"),
                                                graphDetails.get(data_type).get("operation"), 
                                                details.get("month_range"))
-            print df
             return ([pd.to_datetime(str(x)) for x in df[df.columns[0]]], df[graphDetails.get(data_type).get("value")]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
         else: # Avg temp
             maxi = self.group_data_by_time_step(self.get_table(regionName, "tmax", max)
@@ -275,7 +272,7 @@ class Dao:
                                                min, 
                                                details.get("month_range"))
             avgs = self.average_two_columns(maxi['tmax'].tolist(), mini['tmin'].tolist())
-            return ([pd.to_datetime(str(x)) for x in maxi[maxi.columns[0]]], [float(x) if x != "---" else np.NaN for x in avgs]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
+            return ([pd.to_datetime(str(x)) for x in maxi[maxi.columns[0]]], [float(x) if x != "---" else "nan" for x in avgs]) # NaN code from https://stackoverflow.com/questions/34794067/how-to-set-a-cell-to-nan-in-a-pandas-dataframe
             
     def create_graph(self, details, width, height):
         data_type = details.get("data_type")
