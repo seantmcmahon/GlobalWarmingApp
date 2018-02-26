@@ -1,0 +1,72 @@
+#!text
+#:kivy 1.9.1
+#:import sm kivy.uix.screenmanager
+
+<AnalysingScreen>:
+	name: "screen2"
+	screen_manager: screen_manager
+	ScreenManager:
+		id: screen_manager
+		selection: selection
+		Screen:
+			id: selection
+			name: "selection"
+			layout: layout
+			canvas.before:
+		        Color:
+		            rgba: 1, 1, 1, 1
+		        Rectangle:
+		            pos: self.pos
+		            size: self.size
+		        Color:
+					rgba: [0.77, 0.15, 0.15, 1]
+				Rectangle:
+			        pos: 0, self.height * 0.8
+		            size: self.width, self.height * 0.2
+		    FloatLayout:   
+		    	id: layout
+		    	region: region
+		    	data_type: data_type  
+				
+				Label:
+					pos: 0, self.parent.height * 0.8
+					size_hint: (1, 0.2)
+				    text: "ANALYSE EXISTING DATA"
+				    halign: "center"
+				    color: 1, 1, 1, 1
+				        
+		        Label:
+					pos: self.parent.width * 0.05, self.parent.height * 0.57
+					size_hint: (0.22, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Region:"
+				    color: 0, 0, 0, 1
+				    
+				MySpinner:
+		            id: region
+		            text: '<Region>'
+		            pos: self.parent.width * 0.05, self.parent.height * 0.49
+		            values: root.regions
+			            
+				Label:
+					pos: self.parent.width * 0.05, self.parent.height * 0.73
+					size_hint: (0.4, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Data Used:"
+				    color: 0, 0, 0, 1 
+				
+				MySpinner:
+		            id: data_type
+		            text: '<Data>'
+		            pos: self.parent.width * 0.05, self.parent.height * 0.64
+		            values: ['All Data', 'Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
+				
+				Button:
+					pos: self.parent.width * 0.55, self.parent.height * 0.05
+					size_hint: (0.4, 0.18)
+					background_color: [0.2, 0.2, 0.77, 1]
+					background_normal: ''
+				    text: "Predict and View Data"
+				    on_press: root.start_analysis()

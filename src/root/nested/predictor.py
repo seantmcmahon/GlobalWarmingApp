@@ -8,7 +8,7 @@ Class follows example code found at https://www.analyticsvidhya.com/blog/2016/02
 '''
 
 import pandas as pd
-#import numpy as np
+import numpy as np
 import os
 import itertools
 import matplotlib
@@ -98,13 +98,7 @@ class Predictor:
                 index = x
                 break
         
-        return (df[['orig']].iloc[index:], df[['forecast']].iloc[index:])    
-        
-    def predict_future_values(self):
-        pass
-    
-    def predict_past_values(self):
-        pass
+        return (df[['orig']].iloc[index:], df[['forecast']].iloc[index:]) 
     
     def plot_predictions(self, params, width, height):
         years = self.dao.getAvailableYearsForRegion(params.get("region"), params.get("data_type"))

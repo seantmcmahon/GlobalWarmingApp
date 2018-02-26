@@ -21,8 +21,6 @@ class ForecastingScreen(Screen):
         self.dao = App.get_running_app().DAO 
         self.regions = self.dao.getRegionNames()
         self.predictor = Predictor(self.dao)
-        self.unchecked_colour = [0.7, 0, 0, 1]
-        self.checked_colour = [0, 0.7, 0, 1]
         self.path = os.path.abspath(os.path.dirname(__file__))
         super(ForecastingScreen, self).__init__()
         
@@ -32,15 +30,7 @@ class ForecastingScreen(Screen):
             self.screen_manager.selection.layout.interval_step_range_end.disabled = False
         else:
             self.screen_manager.selection.layout.interval_step_range_start.disabled = True
-            self.screen_manager.selection.layout.interval_step_range_end.disabled = True      
-    
-    def view_steps_toggled(self):   
-        if self.screen_manager.selection.layout.view_steps.state == 'down':
-            self.screen_manager.selection.layout.view_steps.background_color = self.checked_colour
-            self.screen_manager.selection.layout.view_steps.text = unichr(8730)
-        else:
-            self.screen_manager.selection.layout.view_steps.background_color = self.unchecked_colour
-            self.screen_manager.selection.layout.view_steps.text = 'x'
+            self.screen_manager.selection.layout.interval_step_range_end.disabled = True   
             
     def predict_data(self):
         details = {}

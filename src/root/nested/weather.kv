@@ -1,10 +1,5 @@
 #:kivy 1.9.1
 #: import sm kivy.uix.screenmanager
-		
-<Screen2>:
-	name: "screen2"
-	Label:
-		text: "Data Analytics Screen"
 
 <Menu>:
 	screen_manager: screen_manager
@@ -41,7 +36,7 @@
 				id: screen_manager
 				transition: sm.SwapTransition()
 				VisualisationScreen
-				Screen2
+				AnalysingScreen
 				ForecastingScreen
 			Button:
 				text: "="

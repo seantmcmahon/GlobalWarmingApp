@@ -160,7 +160,7 @@
 		        	disabled: True
 		        	
 		        Label:
-					pos: self.parent.width * 0.55, self.parent.height * 0.73
+					pos: self.parent.width * 0.05, self.parent.height * 0.73
 					size_hint: (0.4, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -170,8 +170,7 @@
 				MySpinner:
 		            id: data_type
 		            text: '<Data>'
-		            pos: self.parent.width * 0.55, self.parent.height * 0.64
-					size_hint: (0.4, 0.08)
+		            pos: self.parent.width * 0.05, self.parent.height * 0.64
 		            values: ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
 					on_text: root.updateStartYearSpinner()
 #				Label:

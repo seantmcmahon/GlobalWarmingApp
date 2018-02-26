@@ -12,10 +12,8 @@ from kivy.uix.screenmanager import Screen
 from dao import Dao
 
 from visualisation import VisualisationScreen
+from analysing import AnalysingScreen
 from forecasting import ForecastingScreen
-
-class Screen2(Screen):
-    pass
 
 class Menu(NavigationDrawer):
     
