@@ -5,13 +5,13 @@ Created on 9 Jan 2018
 '''
 
 import pandas as pd
-#import numpy as np
-import matplotlib
-matplotlib.use("macosx")
 import os 
 import itertools
 import re
-from matplotlib import pyplot as plt
+#import numpy as np
+"""import matplotlib
+matplotlib.use("macosx")
+from matplotlib import pyplot as plt"""
 
 class Dao:
     
@@ -68,7 +68,7 @@ class Dao:
 
     def __init__(self):
         # Turn interactive plotting off - found on StackOverflow -> https://stackoverflow.com/questions/15713279/calling-pylab-savefig-without-display-in-ipython
-        plt.ioff()
+        # plt.ioff()
         self.path = os.path.abspath(os.path.dirname(__file__))
         self._stations = self._createStationDictionary()
         self._countryStationsMap =  {
@@ -276,7 +276,7 @@ class Dao:
             
     def create_graph(self, details, width, height):
         data_type = details.get("data_type")
-        fig = plt.figure(figsize=(width/96, height/96)) # sizing found at https://stackoverflow.com/questions/13714454/specifying-and-saving-a-figure-with-exact-size-in-pixels/13714720
+        """fig = plt.figure(figsize=(width/96, height/96)) # sizing found at https://stackoverflow.com/questions/13714454/specifying-and-saving-a-figure-with-exact-size-in-pixels/13714720
         graphDetails = {
             "Max Temp": {"value" : "tmax", "label": "Max Temp (deg. C)", "operation": max},
             "Min Temp": {"value" : "tmin", "label": "Min Temp (deg. C)", "operation": min},
@@ -300,6 +300,6 @@ class Dao:
         plt.title(details.get("region") + ' ' + data_type)
         plt.grid(True)
         plt.savefig(self.path + "/imgs/graph.png")
-        plt.close(fig)
+        plt.close(fig)"""
     
     
