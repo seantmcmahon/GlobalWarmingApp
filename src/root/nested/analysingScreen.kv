@@ -8,6 +8,8 @@
 	ScreenManager:
 		id: screen_manager
 		selection: selection
+		display: display
+		textResults: textResults
 		Screen:
 			id: selection
 			name: "selection"
@@ -61,7 +63,7 @@
 		            id: data_type
 		            text: '<Data>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.64
-		            values: ['All Data', 'Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
+		            values: root.data_types
 				
 				Button:
 					pos: self.parent.width * 0.55, self.parent.height * 0.05
@@ -70,3 +72,84 @@
 					background_normal: ''
 				    text: "Predict and View Data"
 				    on_press: root.start_analysis()
+		Screen:
+			id: display
+			name: "display"
+			display_layout: display_layout
+			canvas.before:
+		        Color:
+		            rgba: 1, 1, 1, 1
+		        Rectangle:
+		            pos: self.pos
+		            size: self.size
+		        Color:
+					rgba: [0.77, 0.15, 0.15, 1]
+				Rectangle:
+			        pos: 0, self.height * 0.8
+		            size: self.width, self.height * 0.2
+		    FloatLayout:   
+		    	id: display_layout
+		    	graph: graph 
+				Label:
+					pos: 0, self.parent.height * 0.8
+					size_hint: (1, 0.2)
+				    text: "ANALYSIS RESULTS"
+				    halign: "center"
+				    color: 1, 1, 1, 1
+				Image:
+					id: graph
+					pos: self.parent.width * 0.1, self.parent.height * -0.1
+					size_hint: (0.8, 1)
+					source: root.graphName
+				Button:
+					text: "<-"
+					pos: 0, self.parent.height * 0.6
+					size_hint: (0.1, 0.2)
+					background_color: [0, 0, 1, 1]
+					background_normal: ''
+					on_press: root.screen_manager.current = "selection"
+				Button:
+					text: "->"
+					pos: self.parent.width * 0.9, self.parent.height * 0.6
+					size_hint: (0.1, 0.2)
+					background_color: [0, 0, 1, 1]
+					background_normal: ''
+					on_press: root.screen_manager.current = "textResults"
+		Screen:
+			id: textResults
+			name: "textResults"
+			results_layout: results_layout
+			canvas.before:
+		        Color:
+		            rgba: 1, 1, 1, 1
+		        Rectangle:
+		            pos: self.pos
+		            size: self.size
+		        Color:
+					rgba: [0.77, 0.15, 0.15, 1]
+				Rectangle:
+			        pos: 0, self.height * 0.8
+		            size: self.width, self.height * 0.2
+		    FloatLayout:   
+		    	id: results_layout
+		    	results: results 
+				Label:
+					pos: 0, self.parent.height * 0.8
+					size_hint: (1, 0.2)
+				    text: "RESULTS EXPLAINED"
+				    halign: "center"
+				    color: 1, 1, 1, 1
+				Label:
+					id: results
+					text_size: self.width * 0.8, None
+					pos: 0, 0
+					text: root.results_text
+					color: 0, 0, 0, 1
+					source: ''
+				Button:
+					text: "<-"
+					pos: 0, self.parent.height * 0.6
+					size_hint: (0.1, 0.2)
+					background_color: [0, 0, 1, 1]
+					background_normal: ''
+					on_press: root.screen_manager.current = "display"

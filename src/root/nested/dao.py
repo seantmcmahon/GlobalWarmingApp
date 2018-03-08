@@ -245,9 +245,9 @@ class Dao:
             "Air Frost Days": {"value" : "af", "label": "Air Frost Days", "operation": sum},
             "Total Rainfall": {"value" : "rain", "label": "Total Rainfall (mm)", "operation": sum},
             "Avg Rainfall": {"value" : "rain", "label": "Avg Rainfall (mm)", "operation": "avg"},
-            "Max Sun Hours": {"value" : "tmax", "label": "Max Sun Hours", "operation": max},
-            "Min Sun Hours": {"value" : "tmax", "label": "Min Sun Hours", "operation": min},
-            "Avg Sun hours": {"value" : "tmax", "label": "Avg Sun Hours", "operation": "avg"},
+            "Max Sun Hours": {"value" : "sun", "label": "Max Sun Hours", "operation": max},
+            "Min Sun Hours": {"value" : "sun", "label": "Min Sun Hours", "operation": min},
+            "Avg Sun hours": {"value" : "sun", "label": "Avg Sun Hours", "operation": "avg"},
         }
         
         if data_type in graphDetails.keys():

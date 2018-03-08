@@ -14,7 +14,6 @@ import os
 import itertools
 import matplotlib
 import math
-matplotlib.use("macosx")
 # from matplotlib import pyplot as plt
 from statsmodels.tsa.arima_model import ARIMA
 

@@ -110,9 +110,14 @@ class Dao:
                       "Ross-On-Wye", "Valley"],
             "Northern Ireland": ["Armagh", "Ballypatrick Forest"]
         }
-
-    def getRegionNames(self):
-        return ['UK'] + self._countryStationsMap.keys() + self._stations.keys()
+        self._dataTypes = {
+            "Max Temp": "tmax",
+            "Min Temp": "tmin",
+            "Mean Temp": "tmean",
+            "Rainfall": "rain",
+            "Air Frost Days": "af",
+            "Sun Hours": "sun"
+            }
 
     def getAvailableYearsForRegion(self, regionName, data_type):
         if regionName == "UK":
@@ -125,14 +130,15 @@ class Dao:
             return sorted([item for sublist in years for item in sublist])
         else:
             df = self._stations.get(regionName)
-            val = {"Max Temp": "tmax", "Min Temp": "tmin",
-                   "Mean Temp": "tmean", "Air Frost Days": "af",
-                   "Rainfall": "rain", "Sun Hours": "sun"}.get(data_type)
+            val = self._dataTypes.get(data_type)
             return sorted(list(set(df[
                 df[val].notnull()].loc[:, 'yyyy'].tolist())))
 
     def values_by_month(self, df, value):
-        return df.groupby(['yyyy', 'mm'])[value].apply(list)
+        '''
+        Return a Pandas Series
+        '''
+        return df[value]
 
     def values_by_specified_month(self, df, value, month):
         month = self.months.index(month) + 1
@@ -175,7 +181,7 @@ class Dao:
                                            ascending=[True, True])
 
     def get_table_for_uk(self, value):
-        ukStations = pd.concat([self.self.get_table(x, value) for x in
+        ukStations = pd.concat([self.get_table(x, value) for x in
                                 self._stations.keys()])
         return ukStations.sort_values(['yyyy', 'mm'], ascending=[True, True])
 
@@ -187,11 +193,12 @@ class Dao:
         else:
             return self._stations.get(region)[['yyyy', 'mm', 'season', value]]
 
-    def get_values(self, region, data, start, end, step, operation,
+    def get_values(self, region, datatype, start, end, step, operation,
                    month_range=None):
+        data = self._dataTypes.get(datatype)
         df = self.get_table(region, data).loc[start:end]
         if step == "Month":
-            return self.values_by_month(df, data).apply(operation)
+            return self.values_by_month(df, data)
         elif step == "Season":
             return self.values_by_season(df, data).apply(operation)
         elif step == "Year":
@@ -208,3 +215,11 @@ class Dao:
         else:  # Custom Month Range
             return self.values_by_annual_month_range(
                 df, data, operation, month_range).apply(operation)
+
+    def getDataTypes(self):
+        return sorted(self._dataTypes.keys())
+
+    def getRegionNames(self):
+        regions = [[x] + sorted(self._countryStationsMap.get(x))
+                   for x in sorted(self._countryStationsMap.keys())]
+        return ['UK'] + [item for sublist in regions for item in sublist]

@@ -5,13 +5,10 @@ Created on 24 Feb 2018
 '''
 
 import pandas as pd
-# from plotter import plotGraph
-# import numpy as np
-import os
-import matplotlib
+from plotter import plotGraph, plot2Graphs
+import math
 from newDao import Dao
-from numpy import std, mean
-matplotlib.use("macosx")
+from numpy import nanmean, nanstd
 
 
 class Analyser:
@@ -26,9 +23,8 @@ class Analyser:
 
     def __init__(self, dao):
         self.dao = Dao()
-        self.path = os.path.abspath(os.path.dirname(__file__))
 
-    def plotGraph(self, series, graphName):
+    def getGradient(self, series):
         """
         Plot all points, then plot line of best and return its gradient in the
         tuple (m, c) as in y = mx + c
@@ -50,63 +46,66 @@ class Analyser:
 
         return m, c
 
-    def remove_initial_NaNs(self, series):
-        pass
+    def analyse_by_year(self, values):
+        mx, _ = self.getGradient(values)
+        return mx
 
-    def remove_NaNs(self, df):
-        newValues = []
-        for x in df.tolist():
-            newYs = []
-            ys = x.tolist()
-            for y in ys:
-                if str(y) != "nan":
-                    newYs.append(y)
-            newValues.append(newYs)
-        df.columns['oldTS']
-        print df.head()
-        df['ts'] = pd.Series(newValues, index=df.index)
-        df.drop('oldTS', axis=1, inplace=True)
-        print df.head()
-        return df
-
-    def analyse_seasonal(self, df):
-        pass
-
-    def analyse_annual(self, df):
-        pass
-
-    def analyse_decades(self, df):
-        df[(df.ts != float("nan")).idxmax():]
-        print df
-        df = df.groupby((df.index.year//10)*10)["ts"]
-        stddevs = df.std()
-        means = df.mean()
-        # plot the std. devs with a line of best fit, get gradient of this line
+    def analyse_by_decade(self, series, op):
+        df = pd.DataFrame({"vals": series, "years": series.index})
+        values = df.groupby((df["years"].astype('int')//10)*10)["vals"].apply(list).apply(op)
+        # plot the results with a line of best fit, get gradient of this line
         # positive gradient means increased values for data type and vice versa
         # same for means
-        stdDevM, stdDevC = self.plotGraph(stddevs, "decadeStdDev")
-        meanM, meanC = self.plotGraph(means, "decadeMean")
-        print "Std. Dev. best fine line: y = {:.3f}x + {:.3f}".format(
-            stdDevM, stdDevC)
-        print "Mean best fine line: y = {:.3f}x + {:.3f}".format(meanM, meanC)
+        mx, _ = self.getGradient(values)
+        return mx
 
-    def analyse_individual_station(self, region, dataType):
-        print "Start Analysis"
-        years = self.dao.getAvailableYearsForRegion(region, dataType)
-        df = self.dao.get_values(region, dataType, "Decade", years[0], years[-1], "Decade", std)
-        df = self.dao.get_values(region, dataType, "Decade", years[0], years[-1], "Decade", mean)
-        # ts = pd.DataFrame({"ts": ts}, index=times, dtype=float)
-        print df
-        """if params['data_type'] != "All Data":
-            decadeResults = self.analyse_decades(ts)
-            annualResults = self.analyse_annual(ts)
-            seasonalResults = self.analyse_seasonal(ts) """
+    def analyseMean(self, values, region, dataType):
+        m, c = self.getGradient(values)
+        if m > 0:
+            message = "From the data available, there is evidence of an increase in "\
+                + dataType + " in " + region + ", as can be seen in the previous graph."
+        else:
+            message = "From the data available, there is no evidence of an increase in "\
+                + dataType + " in " + region + " as can be seen in the previous graph."\
+                + "From this test, there is no evidence of climate change in " + region
+        valuelist = values.tolist()
+        series = [values, [(m * x) + c for x in range(len(valuelist))]]
+        return("Mean " + dataType + " for: " + region, dataType, series, message)
 
-    def analyse_country(self, params):
-        pass
+    def analyseStd(self, values, region, dataType):
+        m, c = self.getGradient(values)
+        if m > 0:
+            message = "From the data available, there is evidence of an increase in "\
+                + dataType + " variance in " + region + ", as can be seen in the previous graph."
+        else:
+            message = "From the data available, there is no evidence of an increase in "\
+                + dataType + "variance in " + region + ", as can be seen in the previous graph."\
+                + "From this test, there is no evidence of climate change in " + region
+        valuelist = values.tolist()
+        series = [values, [(m * x) + c for x in range(len(valuelist))]]
+        return (dataType + " Std. Dev. Data Variance: " + region, dataType, series, message)
 
     def analyse_data(self, region, dataType, width, height):
-        if region in self.dao._stations:
-            self.analyse_individual_station(region, dataType)
-        else:
-            self.analyse_country(region, dataType)
+        years = self.dao.getAvailableYearsForRegion(region, dataType)
+        results = []
+        for x in self.dao.months:
+            for op in [max, min, nanmean, nanstd]:
+                df = self.dao.get_values(region, dataType, years[0], years[-1], x, op)
+                result = self.analyse_by_decade(df, op)
+                if not math.isnan(result):
+                    results.append((op.__name__ + " " + dataType + " by decade for " + x, result, op))
+                result = self.analyse_by_year(df)
+                if not math.isnan(result):
+                    results.append((op.__name__ + " " + dataType + " by decade for " + x, result, op))
+        # print results
+        highestGrad = max(results, key=lambda item: item[1])
+        lowestGrad = min(results, key=lambda item: item[1])
+        # Change this from print to add to a label in the UI, then create a graph for each of them
+        greatest = "The input combination with the greatest trend increase is " + highestGrad[0] + " with a gradient of {:.3f}".format(highestGrad[1])
+        lowest = "The input combination with the greatest trend decrease is " + lowestGrad[0] + " with a gradient of {:.3f}".format(lowestGrad[1]) 
+
+        meanResults = self.analyseMean(self.dao.get_values(region, dataType, years[0], years[-1], "Year", nanmean), region, dataType)
+        stdDevResults = self.analyseStd(self.dao.get_values(region, dataType, years[0], years[-1], "Year", nanstd), region, dataType)
+        plot2Graphs("globWarmResults", meanResults[0], meanResults[1], meanResults[2],
+                    stdDevResults[0], stdDevResults[1], stdDevResults[2])
+        return greatest, lowest, meanResults[3], stdDevResults[3]
