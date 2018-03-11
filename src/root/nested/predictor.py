@@ -9,12 +9,11 @@ Class follows example code found at https://www.analyticsvidhya.com/blog/2016/
 '''
 
 import pandas as pd
-# import numpy as np
 import os
 import itertools
 import matplotlib
 import math
-# from matplotlib import pyplot as plt
+from plotter import plotGraph
 from statsmodels.tsa.arima_model import ARIMA
 
 
@@ -105,25 +104,25 @@ class Predictor:
 
         return (df[['orig']].iloc[index:], df[['forecast']].iloc[index:])
 
-    def plot_predictions(self, params, width, height):
-        years = self.dao.getAvailableYearsForRegion(params.get("region"),
-                                                    params.get("data_type"))
-        params['start_year'] = years[0]
-        params['end_year'] = years[-1]
-        times, ts = self.dao.retrieve_data(params)
-        ts = pd.DataFrame({"ts": ts, "times": times})
-        ts.set_index("times", inplace=True)
+    def plot_predictions(self, region, data_type, prediction_type,
+                         time_step, operation, month_range, width, height):
+        years = self.dao.getAvailableYearsForRegion(region, data_type)
+        start_year = years[0]
+        end_year = years[-1]
+        ts = self.dao.get_values(region, data_type, start_year,
+                                        end_year, time_step, operation,
+                                        month_range)
+        ts = pd.DataFrame({"ts": ts})
         try:
-            ts = ts[ts['ts'] != "nan"]
+            ts = ts[math.isnan(ts['ts']) != True]
         except:
             pass
-        if params["prediction_type"] == "Past Values":
+        if prediction_type == "Past Values":
             ts = ts.iloc[::-1]
         (p, d, q) = self.getBestFitModel(ts.iloc[-60:])
         (current, forecast) = (None, None)
-        if params['prediction_type'] == "Past Values":
-            start = self.dao.getAvailableYearsForRegion(params['region'],
-                                                        params['data_type'])
+        if prediction_type == "Past Values":
+            start = self.dao.getAvailableYearsForRegion(region, data_type)
             print "Start year: ", start[0]
             (current, forecast) = self.predict(ts, p, d, q,
                                                predict_type="Past Values",
@@ -132,15 +131,8 @@ class Predictor:
             (current, forecast) = self.predict(ts, p, d, q)
         print forecast
         print p, d, q
-        # plot
-        """fig = plt.figure(figsize=(5, 2))
-        plt.plot(current, color='red')
-        plt.plot(forecast, color='green')
-        plt.ylabel(params['data_type'])
-        plt.title("Forecast: " + params['region'] + " " +
-                  params['prediction_type'])
-        plt.savefig(self.path + "/imgs/newModel.png")
-        plt.close(fig)"""
+        plotGraph("newModel", "Forecast: " + region + " " + operation + " " +
+                  data_type, "Years", data_type, [current, forecast])
 
     def __init__(self, dao):
         self.dao = dao

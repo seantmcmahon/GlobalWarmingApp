@@ -31,7 +31,8 @@
 		    	time_step: time_step
 		    	interval_step_range_start: interval_step_range_start
 		    	interval_step_range_end: interval_step_range_end
-		    	data_type: data_type  
+		    	data_type: data_type 
+		    	operation: operation 
 				
 				Label:
 					pos: 0, self.parent.height * 0.8
@@ -50,10 +51,10 @@
 				    
 				MySpinner:
 		            id: region
-		            text: '<Region>'
+		            text: '<Select>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.49
 		            values: root.regions
-			            
+		                    
 				Label:
 					pos: self.parent.width * 0.05, self.parent.height * 0.42
 					size_hint: (0.47, 0.08)
@@ -78,9 +79,9 @@
 				
 				MySpinner:
 		            id: time_step
-		            text: '<Time Step>'
+		            text: '<Select>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.15
-		            values: ['Month', 'Season', 'Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Annually', 'Summer (Jun - Aug) Annually', 'Autumn (Sep - Nov) Annually', 'Winter (Dec - Feb) Annually', 'Custom Months Annually']  
+		            values: ['Full Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring Annually', 'Summer Annually', 'Autumn Annually', 'Winter Annually', 'Custom Months Annually']  
 					on_text: root.timeStepSelected(*args)
 					
 				MySpinner:
@@ -89,7 +90,7 @@
 		            pos: self.parent.width * 0.05, self.parent.height * 0.05
 					size_hint: (0.22, 0.08)
 		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-		        	disabled: True
+		        	disabled: root.month_range_start
 		        	
 		        MySpinner:
 		            id: interval_step_range_end
@@ -97,7 +98,7 @@
 		            pos: self.parent.width * 0.3, self.parent.height * 0.05
 					size_hint: (0.22, 0.08)
 		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-		        	disabled: True
+		        	disabled: root.month_range_end
 		        	
 		        Label:
 					pos: self.parent.width * 0.05, self.parent.height * 0.73
@@ -109,9 +110,24 @@
 				
 				MySpinner:
 		            id: data_type
-		            text: '<Data>'
+		            text: '<Select>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.64
-		            values: ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
+		            values: root.data_types 
+		        
+		        Label:
+					pos: self.parent.width * 0.55, self.parent.height * 0.73
+					size_hint: (0.2, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Data Operation:"
+				    color: 0, 0, 0, 1 
+				
+				MySpinner:
+		            id: operation
+		            text: '<Select>'
+		            pos: self.parent.width * 0.55, self.parent.height * 0.64
+		            size_hint: (0.4, 0.08)
+		            values: ['Highest', 'Lowest', 'Mean Average', 'Standard Deviation']   
 				
 				Button:
 					pos: self.parent.width * 0.55, self.parent.height * 0.05
@@ -148,7 +164,7 @@
 					id: graph
 					pos: self.parent.width * 0.1, self.parent.height * -0.1
 					size_hint: (0.9, 1)
-					source: ''
+					source: root.image_source
 				Button:
 					text: "<-"
 					pos: 0, self.parent.height * 0.6

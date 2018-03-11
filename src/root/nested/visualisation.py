@@ -6,14 +6,20 @@ Created on 26 Dec 2017
 import kivy
 kivy.require('1.9.1')
 
-from kivy.lang import Builder 
+from kivy.lang import Builder
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
+from plotter import plotGraph
+from kivy.properties import StringProperty, ListProperty, BooleanProperty
 
 Builder.load_file('visualisationScreen.kv')
 
 
 class VisualisationScreen(Screen):
+    data_types = ListProperty()
+    month_range_start = BooleanProperty()
+    month_range_end = BooleanProperty()
+    image_source = StringProperty()
 
     def __init__(self, **kwargs):
         self.dao = App.get_running_app().DAO
@@ -25,8 +31,7 @@ class VisualisationScreen(Screen):
     def updateStartYearSpinner(self):
         region = self.screen_manager.selection.layout.region.text
         data_type = self.screen_manager.selection.layout.data_type.text
-        print region, data_type
-        if region != '<Region>' and data_type != '<Data>':
+        if "<Select>" not in [region, data_type]:
             self.screen_manager.selection.layout.start_year.text = 'Year'
             self.screen_manager.selection.layout.start_year.disabled = False
             self.screen_manager.selection.layout.start_year.values = self\
@@ -41,7 +46,7 @@ class VisualisationScreen(Screen):
             .dao.getAvailableYearsForRegion(region, data_type)
 
     def updatePossibleTimeSteps(self):
-        full_selection = ['Month', 'Season', 'Year', 'Jan Annually',
+        full_selection = ['Month', 'Season', 'Full Year', 'Jan Annually',
                           'Feb Annually', 'Mar Annually', 'Apr Annually',
                           'May Annually', 'Jun Annually', 'Jul Annually',
                           'Aug Annually', 'Sep Annually', 'Oct Annually',
@@ -80,20 +85,24 @@ class VisualisationScreen(Screen):
         # graph_type = self.screen_manager.selection.layout.graph_type.text
         # details['graph_type'] = graph_type
         # if graph_type != "Weather Graph" :
-        details['data_type'] = self.screen_manager.selection.layout.data_type.text
-        details["region"] = self.screen_manager.selection.layout.region.text
-        details["start_year"] = self.screen_manager.selection.layout.start_year.text
-        details["end_year"] = self.screen_manager.selection.layout.end_year.text
-        details["time_step"] = self.screen_manager.selection.layout.time_step.text
+        data_type = self.screen_manager.selection.layout.data_type.text
+        region = self.screen_manager.selection.layout.region.text
+        start_year = self.screen_manager.selection.layout.start_year.text
+        end_year = self.screen_manager.selection.layout.end_year.text
+        time_step = self.screen_manager.selection.layout.time_step.text
+        operation = self.screen_manager.selection.layout.operation.text
+        month_range = None
         if self.screen_manager.selection.layout.time_step.text == "Custom Months Annually":
             start = self.screen_manager.selection.layout.interval_step_range_start.text
             end = self.screen_manager.selection.layout.interval_step_range_end.text
             months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
                       "Aug", "Sep", "Oct", "Nov", "Dec"]
-            details["month_range"] = range(int(months.index(start))+1,
+            month_range = range(int(months.index(start))+1,
                                            int(months.index(end))+2)
 
-        self.dao.create_graph(details, 500, 250)
+        series = self.dao.get_values(region, data_type, start_year, end_year,
+                                     time_step, operation, month_range)
+        plotGraph("graph", operation + " " + data_type + " By " + time_step + " For " + region, "Time", data_type, [series])
         self.screen_manager.display.display_layout.graph.source = ''
         self.screen_manager.display.display_layout.graph.reload()
         self.screen_manager.display.display_layout.graph.source = 'imgs/graph.png'

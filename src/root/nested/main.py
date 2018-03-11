@@ -3,7 +3,7 @@ Created on 7 Dec 2017
 
 @author: seantmcmahon
 '''
-from dao import Dao
+from newDao import Dao
 
 from visualisation import VisualisationScreen
 from analysing import AnalysingScreen

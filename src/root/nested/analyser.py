@@ -89,7 +89,7 @@ class Analyser:
         years = self.dao.getAvailableYearsForRegion(region, dataType)
         results = []
         for x in self.dao.months:
-            for op in [max, min, nanmean, nanstd]:
+            for op in self.dao.getPossibleOperations():
                 df = self.dao.get_values(region, dataType, years[0], years[-1], x, op)
                 result = self.analyse_by_decade(df, op)
                 if not math.isnan(result):
@@ -104,8 +104,8 @@ class Analyser:
         greatest = "The input combination with the greatest trend increase is " + highestGrad[0] + " with a gradient of {:.3f}".format(highestGrad[1])
         lowest = "The input combination with the greatest trend decrease is " + lowestGrad[0] + " with a gradient of {:.3f}".format(lowestGrad[1]) 
 
-        meanResults = self.analyseMean(self.dao.get_values(region, dataType, years[0], years[-1], "Year", nanmean), region, dataType)
-        stdDevResults = self.analyseStd(self.dao.get_values(region, dataType, years[0], years[-1], "Year", nanstd), region, dataType)
+        meanResults = self.analyseMean(self.dao.get_values(region, dataType, years[0], years[-1], "Full Year", nanmean), region, dataType)
+        stdDevResults = self.analyseStd(self.dao.get_values(region, dataType, years[0], years[-1], "Full Year", nanstd), region, dataType)
         plot2Graphs("globWarmResults", meanResults[0], meanResults[1], meanResults[2],
                     stdDevResults[0], stdDevResults[1], stdDevResults[2])
         return greatest, lowest, meanResults[3], stdDevResults[3]
