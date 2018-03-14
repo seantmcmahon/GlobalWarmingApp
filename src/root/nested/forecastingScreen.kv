@@ -89,15 +89,16 @@
 		            text: '<Month>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.05
 					size_hint: (0.22, 0.08)
-		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		            values: root.month_range_start_list
 		        	disabled: root.month_range_start
+		        	on_text: root.monthStartSelected(*args)
 		        	
 		        MySpinner:
 		            id: interval_step_range_end
 		            text: '<Month>'
 		            pos: self.parent.width * 0.3, self.parent.height * 0.05
 					size_hint: (0.22, 0.08)
-		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		            values: root.month_range_end_list
 		        	disabled: root.month_range_end
 		        	
 		        Label:

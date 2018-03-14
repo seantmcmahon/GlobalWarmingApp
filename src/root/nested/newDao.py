@@ -216,11 +216,10 @@ class Dao:
                 df, data, step.replace(" Annually", '')).apply(op)
         elif step.replace(" Annually", '')in self.seasons:
             return self.values_by_specified_season(
-                df, data, operation,
-                step.replace(" Annually", '')).apply(op)
+                df, data, step.replace(" Annually", '')).apply(op)
         else:  # Custom Month Range
             return self.values_by_annual_month_range(
-                df, data, operation, month_range).apply(op)
+                df, data, month_range).apply(op)
 
     def getDataTypes(self):
         return sorted(self._dataTypes.keys())

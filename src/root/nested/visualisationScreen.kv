@@ -106,7 +106,7 @@
 		            text: 'Year'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.33
 					size_hint: (0.22, 0.08)
-		            values: ['']
+		            values: root.start_year
 		            disabled: True
 		            on_text: root.updateEndYearSpinner()
 		                      
@@ -123,7 +123,7 @@
 		            text: 'Year'
 		            pos: self.parent.width * 0.3, self.parent.height * 0.33
 					size_hint: (0.22, 0.08)
-		            values: ['']
+		            values: root.end_year
 		            on_text: root.updatePossibleTimeSteps()
 		            disabled: True
 		        
@@ -148,15 +148,16 @@
 		            text: '<Month>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.05
 					size_hint: (0.22, 0.08)
-		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		            values: root.month_range_start
 		        	disabled: True
+		        	on_text: root.monthStartSelected(*args)
 		        	
 		        MySpinner:
 		            id: interval_step_range_end
 		            text: '<Month>'
 		            pos: self.parent.width * 0.3, self.parent.height * 0.05
 					size_hint: (0.22, 0.08)
-		            values: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		            values: root.month_range_end
 		        	disabled: True
 		        	
 		        Label:
@@ -171,7 +172,7 @@
 		            id: data_type
 		            text: '<Select>'
 		            pos: self.parent.width * 0.05, self.parent.height * 0.64
-		            values: ['Max Temp', 'Min Temp', 'Avg Max Temp', 'Avg Min Temp', 'Avg Temp', 'Total Rainfall', 'Avg Rainfall', 'Air Frost Days', 'Total Sun Hours', 'Avg Sun Hours']  
+		            values: root.data_types  
 					on_text: root.updateStartYearSpinner()
 					
 				Label:

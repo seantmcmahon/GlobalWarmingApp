@@ -23,6 +23,8 @@ class ForecastingScreen(Screen):
     data_types = ListProperty()
     month_range_start = BooleanProperty()
     month_range_end = BooleanProperty()
+    month_range_start_list = ListProperty()
+    month_range_end_list = ListProperty()
     image_source = StringProperty()
 
     def __init__(self, **kwargs):
@@ -30,15 +32,17 @@ class ForecastingScreen(Screen):
         self.regions = self.dao.getRegionNames()
         self.predictor = Predictor(self.dao)
         self.path = os.path.abspath(os.path.dirname(__file__))
+        self.loading = 'imgs/tenor.gif'
         super(ForecastingScreen, self).__init__()
         self.data_types = self.dao.getDataTypes()
         self.month_range_start = True
         self.month_range_end = True
+        self.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        self.month_range_start_list = self.months
+        self.month_range_end_list = self.months
         self.image_source = ''
         self.error = Popup(title='Error', content=Label(text='Must specify a value for all options.'),
                           size_hint=(0.5, 0.5))
-        self.loading = Popup(title='Loading...', content=Label(text='Performing Action...'),
-                          size_hint=(0.5, 0.5), auto_dismiss=False)
 
     def timeStepSelected(self, *args):
         if args[1] == "Custom Months Annually":
@@ -47,6 +51,12 @@ class ForecastingScreen(Screen):
         else:
             self.month_range_start = True
             self.month_range_end = True
+
+    def monthStartSelected(self, *args):
+        start = self.screen_manager.selection.layout.interval_step_range_start.text
+        remaining_months = self.months[self.months.index(start):]
+        self.screen_manager.selection.layout.interval_step_range_end.text = '<Month>'
+        self.month_range_end_list = remaining_months
 
     def predict_data(self):
         region = self.screen_manager.selection.layout.region.text
@@ -60,7 +70,6 @@ class ForecastingScreen(Screen):
                 (time_step == "Custom Months Annually" and "<Month>" in [start, end]):
             self.error.open()
         else:
-            self.loading.open()
             if time_step == "Custom Months Annually":
                 months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
                           "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -74,5 +83,3 @@ class ForecastingScreen(Screen):
             self.screen_manager.display.display_layout.graph.reload()
             self.image_source = self.path + "/imgs/newModel.png"
             self.screen_manager.display.display_layout.graph.reload()
-            self.loading.dismiss()
-            self.screen_manager.current = "display"
