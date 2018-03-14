@@ -10,11 +10,12 @@ Class follows example code found at https://www.analyticsvidhya.com/blog/2016/
 
 import pandas as pd
 import os
+import numpy as np
 import itertools
-import matplotlib
 import math
 from plotter import plotGraph
 from statsmodels.tsa.arima_model import ARIMA
+from datetime import datetime
 
 
 class Predictor:
@@ -53,56 +54,49 @@ class Predictor:
                 bestModel = x
         return bestModel
 
-    def predict(self, ts, p, d, q, predict_type="Future Values",
-                predict_start=2016):
-        X = ts.values
-        size = int(len(X) * 0.66)
-        train, test = X[0:size], X[size:len(X)]
-        history = [float(x) for x in train]
-        predictions = list()
-        model = None
-        model_fit = None
-        # model existing data
-        for t in range(len(test)):
-            model = ARIMA(history, order=(p, d, q))
-            model_fit = model.fit(disp=0)
-            output = model_fit.forecast()
-            yhat = output[0]
-            predictions.append(yhat)
-            obs = float(test[t])
-            history.append(obs)
-        # model future data
-        for t in range(20):
-            model = ARIMA(history, order=(p, d, q))
-            model_fit = model.fit(disp=0)
-            output = model_fit.forecast()
-            yhat = output[0]
-            predictions.append(yhat)
-            history.append(yhat)
-        preds = [float("nan") for x in range(len(ts) - (len(predictions)-20))]
-        forecast = preds + [x[0] for x in predictions]
-        df = pd.DataFrame({"orig": ts.iloc[:, 0], "forecast": forecast[:-20]})
-        data = []
-        if predict_type == "Future Values":
-            data = [pd.to_datetime("01-01-" + str(2016+x)) for x in range(20)]
-        else:
-            data = [pd.to_datetime("01-01-" + str(predict_start-x))
-                    for x in range(20)]
-            print "forecast years: ", data
+    def difference(self, dataset):
+        diff = list()
+        for i in range(1, len(dataset)):
+            value = dataset[i] - dataset[i - 1]
+            diff.append(value)
+        return np.array(diff)
 
-        orig = [float("nan") for x in range(20)]
-        futures = forecast[-20:]
-        df2 = pd.DataFrame({"orig": orig, "forecast": futures, "ind": data})
-        df2.set_index("ind", inplace=True)
-        df = pd.concat([df, df2])
-        # get first row of forecast that aren't nan
-        index = 0
-        for x in range(len(forecast)):
-            if not math.isnan(forecast[x]):
-                index = x
-                break
+    # invert differenced value
+    def inverse_difference(self, history, yhat, interval=1):
+        return yhat + history[-interval]
 
-        return (df[['orig']].iloc[index:], df[['forecast']].iloc[index:])
+    def forecast(self, X, p, d, q):
+        for j in range(10):
+            differenced = self.difference(X)
+            # fit model
+            model = ARIMA(differenced, order=(p, d, q))
+            model_fit = model.fit(disp=0)
+            # one-step out-of sample forecast
+            forecast = model_fit.forecast()[0]
+            # invert the differenced forecast to something usable
+            forecast = self.inverse_difference(X, forecast)
+            X.append(forecast[0])
+        return X[-10:]
+
+    def get_forecast(self, series):
+        (p, d, q) = self.getBestFitModel(series)
+        X = list(series.values)
+        futures = [list(series.values)[-1]] + self.forecast(list(series.values), p, d, q)
+        past = self.forecast(list(series.values)[::-1], p, d, q)[::-1] + [list(series.values)[0]]
+
+        futuresIndex = [datetime(int(series.index[-1]), 1, 1)] + [datetime(x, 1, 1) for x in range(int(series.index[-1])+1, int(series.index[-1])+11)]
+        pastIndex = [datetime(x, 1, 1) for x in range(int(series.index[0])-10, int(series.index[0]))] + [datetime(int(series.index[0]), 1, 1)]
+        currentIndex = pastIndex[:-1] + [datetime(int(x), 1, 1) for x in series.index] + futuresIndex[1:]
+
+        pastSeries = (pd.Series(past, index=pastIndex), "Past Prediction")
+        futureSeries = (pd.Series(futures, index=futuresIndex), "Future Prediction")
+
+        pastPadding = [np.nan for x in range(10)]
+        futurePadding = [np.nan for x in range(10)]
+        current = list(pastPadding)+list(series.values)+list(futurePadding)
+
+        currentSeries = (pd.Series(current, index=currentIndex), "Existing Data")
+        return (pastSeries, currentSeries, futureSeries)
 
     def plot_predictions(self, region, data_type, prediction_type,
                          time_step, operation, month_range, width, height):
@@ -110,29 +104,23 @@ class Predictor:
         start_year = years[0]
         end_year = years[-1]
         ts = self.dao.get_values(region, data_type, start_year,
-                                        end_year, time_step, operation,
-                                        month_range)
+                                 end_year, time_step, operation,
+                                 month_range)
         ts = pd.DataFrame({"ts": ts})
-        try:
+        """try:
             ts = ts[math.isnan(ts['ts']) != True]
         except:
-            pass
-        if prediction_type == "Past Values":
-            ts = ts.iloc[::-1]
-        (p, d, q) = self.getBestFitModel(ts.iloc[-60:])
-        (current, forecast) = (None, None)
-        if prediction_type == "Past Values":
-            start = self.dao.getAvailableYearsForRegion(region, data_type)
-            print "Start year: ", start[0]
-            (current, forecast) = self.predict(ts, p, d, q,
-                                               predict_type="Past Values",
-                                               predict_start=int(start[0]))
+            pass"""
+        (past, current, future) = self.get_forecast(ts)
+        results = []
+        if prediction_type == "Future Values":
+            results = [current, future]
+        elif prediction_type == "Past Values":
+            results = [past, current]
         else:
-            (current, forecast) = self.predict(ts, p, d, q)
-        print forecast
-        print p, d, q
+            results = [past, current, future]
         plotGraph("newModel", "Forecast: " + region + " " + operation + " " +
-                  data_type, "Years", data_type, [current, forecast])
+                  data_type, "Years", data_type, results)
 
     def __init__(self, dao):
         self.dao = dao

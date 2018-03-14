@@ -119,7 +119,7 @@ class Dao:
         self._operations = {
             "Highest": max,
             "Lowest": min,
-            "Average (Mean)": nanmean,
+            "Mean Average": nanmean,
             "Standard Deviation": nanstd
             }
 
@@ -202,6 +202,7 @@ class Dao:
         data = self._dataTypes.get(datatype)
         df = self.get_table(region, data).loc[start:end]
         op = self._operations.get(operation)
+        print "df", df
         if step == "Month":
             return self.values_by_month(df, data)
         elif step == "Season":

@@ -4,6 +4,7 @@ Created on 24 Feb 2018
 @author: seantmcmahon
 '''
 import os
+import threading
 from analyser import Analyser
 from newDao import Dao
 import kivy
@@ -13,6 +14,8 @@ from kivy.properties import StringProperty, ListProperty
 from kivy.lang import Builder 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
 
 Builder.load_file('analysingScreen.kv')
 
@@ -31,15 +34,31 @@ class AnalysingScreen(Screen):
         self.graphName = ''
         self.results_text = ''
         self.data_types = self.dao.getDataTypes()
+        self.error = Popup(title='Error', content=Label(text='Must specify a value for all options.'),
+                          size_hint=(0.5, 0.5))
+        self.loading = Popup(title='Loading...', content=Label(text='Performing Action...'),
+                          size_hint=(0.5, 0.5), auto_dismiss=False)
 
-    def start_analysis(self):
+    def analyse(self):
+        region = self.screen_manager.selection.layout.region.text
+        data_type = self.screen_manager.selection.layout.data_type.text
         greatest, smallest, meanRes, stdDevRes = self.analyser.analyse_data(
-            self.screen_manager.selection.layout.region.text,
-            self.screen_manager.selection.layout.data_type.text, 500, 250)
+                region, data_type, 500, 250)
         self.graphName = ''
         self.screen_manager.display.display_layout.graph.reload()
         self.graphName = self.path + '/imgs/globWarmResults.png'
         self.screen_manager.display.display_layout.graph.reload()
         self.results_text =\
             "\n\n" + greatest + "\n\n" + smallest + "\n\n" + meanRes + "\n\n" + stdDevRes
-        self.screen_manager.current = "display"
+
+    def start_analysis(self):
+        region = self.screen_manager.selection.layout.region.text
+        data_type = self.screen_manager.selection.layout.data_type.text
+        if "<Select>" in [region, data_type]:
+            self.error.open()
+        else:
+            self.loading.open()
+            mythread = threading.Thread(target=self.analyse)
+            mythread.start()
+            self.loading.dismiss()
+            self.screen_manager.current = "display"

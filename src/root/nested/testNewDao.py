@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
 
     def test_get_values(self):
         self.assertEqual(self.dao.get_values(
-            "Aberporth", "rain", '1941', '1942', "Year", max,
+            "Aberporth", "Rainfall", '1941', '1942', "Full Year", "Highest",
             month_range=None).iloc[0], 106.2)
 
 

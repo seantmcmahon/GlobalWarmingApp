@@ -14,13 +14,16 @@ def plotGraph(fileName, title, xName, yName, dataSeries):
 
     fig = plt.figure(figsize=(6, 2))
     plt.title(title)
-    plt.xlabel(xName)
     plt.ylabel(yName)
     for x in dataSeries:
-        plt.plot(x)
-    # fig.xaxis.set_major_locator(plt.MaxNLocator(10))
-    # plt.grid(True)
-    # plt.locator_params(axis='x', nticks=12)
+        print x
+        plt.plot(x[0], label=x[1])
+    ticks = max([x[0] for x in dataSeries], key=len).index
+    while len(ticks) > 10:
+        ticks = ticks[::2]
+    plt.xticks(ticks)
+    # plt.set_xlabel(xName)
+    plt.legend()
     plt.savefig(os.path.abspath(os.path.dirname(__file__)) + "/imgs/" + fileName + ".png")
     plt.close(fig)
 
