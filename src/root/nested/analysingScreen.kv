@@ -5,6 +5,25 @@
 <AnalysingScreen>:
 	name: "screen2"
 	screen_manager: screen_manager
+	images: images
+	FloatLayout:
+		id: images
+		carousel: carousel
+		Carousel:
+			id: carousel
+			direction: "right"
+			scroll_timeout: 1
+			loop: True
+			canvas.after:
+        		Color:
+        			rgba: 1, 1, 1, 0.65
+            	Rectangle:
+            		pos: (self.width * 0.15, self.height * 0.15)
+            		size: (self.width * 0.7, self.height * 0.7)
+        	AsyncImage:
+        		source: "imgs/northernireland.jpg"
+        		allow_stretch: True
+        		keep_ratio: False
 	ScreenManager:
 		id: screen_manager
 		selection: selection
@@ -14,31 +33,22 @@
 			id: selection
 			name: "selection"
 			layout: layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: layout
 		    	region: region
 		    	data_type: data_type  
 				
 				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "ANALYSE EXISTING DATA"
-				    halign: "center"
-				    color: 1, 1, 1, 1
+					pos: self.parent.width * 0.15, self.parent.height * 0.72
+					size_hint: (0.7, 0.10)
+					text_size: self.size
+					font_size: 28
+					halign: "center"
+				    text: "Analyse Data"
+				    color: 0, 0, 0, 1
 				        
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.57
+					pos: self.parent.width * 0.175, self.parent.height * 0.68
 					size_hint: (0.22, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -48,12 +58,12 @@
 				MySpinner:
 		            id: region
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.49
+		            pos: self.parent.width * 0.175, self.parent.height * 0.59
 		            values: root.regions
 			            
 				Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.73
-					size_hint: (0.4, 0.08)
+					pos: self.parent.width * 0.525, self.parent.height * 0.68
+					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
 				    text: "Data Used:"
@@ -62,94 +72,73 @@
 				MySpinner:
 		            id: data_type
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.64
+		            pos: self.parent.width * 0.525, self.parent.height * 0.59
+		            size_hint: (0.3, 0.08)
 		            values: root.data_types
 				
 				Button:
-					pos: self.parent.width * 0.55, self.parent.height * 0.05
-					size_hint: (0.4, 0.18)
+					pos: self.parent.width * 0.35, self.parent.height * 0.175
+					size_hint: (0.3, 0.08)
 					background_color: [0.2, 0.2, 0.77, 1]
 					background_normal: ''
-				    text: "Predict and View Data"
-				    on_press: root.start_analysis()
+				    text: "Analyse and View Data"
+				    #on_press: root.start_analysis()
+				    on_press: root.screen_manager.current = "textResults"
 		Screen:
 			id: display
 			name: "display"
 			display_layout: display_layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: display_layout
 		    	graph: graph 
-				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "ANALYSIS RESULTS"
-				    halign: "center"
-				    color: 1, 1, 1, 1
 				Image:
 					id: graph
-					pos: self.parent.width * 0.1, self.parent.height * -0.1
-					size_hint: (0.8, 1)
+					pos: self.parent.width * 0.175, self.parent.height * 0.175
+					size_hint: (0.65, 0.65)
 					source: root.graphName
+					allow_stretch: True
+					keep_ratio: False
 				Button:
-					text: "<-"
-					pos: 0, self.parent.height * 0.6
+					pos: self.parent.width * 0.125, self.parent.height * 0.65
 					size_hint: (0.1, 0.2)
-					background_color: [0, 0, 1, 1]
-					background_normal: ''
+					background_normal: 'imgs/back.png'
+					background_down: 'imgs/back.png'
 					on_press: root.screen_manager.current = "selection"
 				Button:
-					text: "->"
 					pos: self.parent.width * 0.9, self.parent.height * 0.6
 					size_hint: (0.1, 0.2)
-					background_color: [0, 0, 1, 1]
-					background_normal: ''
+					background_normal: 'imgs/help.png'
+					background_down: 'imgs/help.png'
 					on_press: root.screen_manager.current = "textResults"
 		Screen:
 			id: textResults
 			name: "textResults"
 			results_layout: results_layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: results_layout
-		    	results: results 
 				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "RESULTS EXPLAINED"
-				    halign: "center"
-				    color: 1, 1, 1, 1
+					pos: self.parent.width * 0.15, self.parent.height * 0.72
+					size_hint: (0.7, 0.1)
+					text_size: self.size
+					font_size: 28
+					halign: "center"
+				    text: "Results Explained"
+				    color: 0, 0, 0, 1
 				Label:
 					id: results
-					text_size: self.width * 0.8, None
-					pos: 0, 0
-					text: root.results_text
+					pos: self.parent.width * 0.175, self.parent.height * 0.175
+					width: self.parent.width * 0.7
+					size_hint_y: None
+				    text_size: self.parent.width * 0.7, None
+				    height: self.texture_size[1]
+					font_size: '10sp'
+					halign: "left"
+					#text: root.results_text
+					text: "blah blah blah " * 15
 					color: 0, 0, 0, 1
-					source: ''
 				Button:
-					text: "<-"
-					pos: 0, self.parent.height * 0.6
+					pos: self.parent.width * 0.125, self.parent.height * 0.65
 					size_hint: (0.1, 0.2)
-					background_color: [0, 0, 1, 1]
-					background_normal: ''
+					background_normal: 'imgs/back.png'
+					background_down: 'imgs/back.png'
 					on_press: root.screen_manager.current = "display"

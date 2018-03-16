@@ -21,11 +21,30 @@
 	background_normal: 'imgs/button_img.jpeg'
 	color: spinner_font_colour
 	option_cls: Factory.get("MySpinnerOption")
-	size_hint: (0.47, 0.08)
+	size_hint: (0.3, 0.08)
 
 <VisualisationScreen>:
 	name: "screen1"
 	screen_manager: screen_manager
+	images: images
+	FloatLayout:
+		id: images
+		carousel: carousel
+		Carousel:
+			id: carousel
+			direction: "right"
+			scroll_timeout: 1
+			loop: True
+			canvas.after:
+        		Color:
+        			rgba: 1, 1, 1, 0.65
+            	Rectangle:
+            		pos: (self.width * 0.15, self.height * 0.15)
+            		size: (self.width * 0.7, self.height * 0.7)
+			AsyncImage:
+				source: "imgs/uk.jpg"
+				allow_stretch: True
+				keep_ratio: False
 	ScreenManager:
 		id: screen_manager
 		selection: selection
@@ -34,20 +53,8 @@
 			id: selection
 			name: "selection"
 			layout: layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: layout
-#		    	graph_type: graph_type
 		    	region: region
 		    	start_year: start_year
 		    	end_year: end_year
@@ -55,31 +62,19 @@
 		    	interval_step_range_start: interval_step_range_start
 		    	interval_step_range_end: interval_step_range_end
 		    	data_type: data_type 
-		    	operation: operation   
-				
-				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "CREATE GRAPH"
-				    halign: "center"
-				    color: 1, 1, 1, 1
-				    
-#				Label:
-#					pos: self.parent.width * 0.05, self.parent.height * 0.73
-#					size_hint: (0.35, 0.08)
-#					text_size: self.size
-#					halign: "left"
-#				    text: "Graph Type:"
-#				    color: 0, 0, 0, 1 
-				
-#				MySpinner:
-#		            id: graph_type
-#		            text: '<Select Graph>'
-#		            values: ['Line Graph', 'Bar Graph', 'Weather Graph', 'Smoothed Line Graph']
-#		            pos: self.parent.width * 0.05, self.parent.height * 0.64
+		    	operation: operation  
 		            
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.57
+					pos: self.parent.width * 0.15, self.parent.height * 0.72
+					size_hint: (0.7, 0.10)
+					text_size: self.size
+					font_size: 28
+					halign: "center"
+				    text: "Visualise Data"
+				    color: 0, 0, 0, 1
+				
+				Label:
+					pos: self.parent.width * 0.175, self.parent.height * 0.52
 					size_hint: (0.22, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -89,12 +84,12 @@
 				MySpinner:
 		            id: region
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.49
+		            pos: self.parent.width * 0.175, self.parent.height * 0.44
 		            values: root.regions
 		            on_text: root.updateStartYearSpinner()
 			            
 				Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.42
+					pos: self.parent.width * 0.175, self.parent.height * 0.37
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -104,14 +99,14 @@
 				MySpinner:
 		            id: start_year
 		            text: 'Year'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.33
-					size_hint: (0.22, 0.08)
+		            pos: self.parent.width * 0.175, self.parent.height * 0.28
+					size_hint: (0.125, 0.08)
 		            values: root.start_year
 		            disabled: True
 		            on_text: root.updateEndYearSpinner()
 		                      
 				Label:
-					pos: self.parent.width * 0.3, self.parent.height * 0.42
+					pos: self.parent.width * 0.35, self.parent.height * 0.37
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -121,14 +116,14 @@
 				MySpinner:
 		            id: end_year
 		            text: 'Year'
-		            pos: self.parent.width * 0.3, self.parent.height * 0.33
-					size_hint: (0.22, 0.08)
+		            pos: self.parent.width * 0.35, self.parent.height * 0.28
+					size_hint: (0.125, 0.08)
 		            values: root.end_year
 		            on_text: root.updatePossibleTimeSteps()
 		            disabled: True
 		        
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.25
+					pos: self.parent.width * 0.525, self.parent.height * 0.52
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -138,98 +133,99 @@
 				MySpinner:
 		            id: time_step
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.15
-		            values: ['Month', 'Season', 'Full Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring (Mar - May) Annually', 'Summer (Jun - Aug) Annually', 'Autumn (Sep - Nov) Annually', 'Winter (Dec - Feb) Annually', 'Custom Months Annually']  
+		            pos: self.parent.width * 0.525, self.parent.height * 0.44
+		            values: ['Month', 'Season', 'Full Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring Annually', 'Summer Annually', 'Autumn Annually', 'Winter Annually', 'Custom Months Annually']  
 					on_text: root.timeStepSelected(*args)
 					disabled: True
 					
+				Label:
+					pos: self.parent.width * 0.525, self.parent.height * 0.37
+					size_hint: (0.2, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Start Month:"
+				    color: 0, 0, 0, 1
+				    
 				MySpinner:
 		            id: interval_step_range_start
 		            text: '<Month>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.05
-					size_hint: (0.22, 0.08)
+		            pos: self.parent.width * 0.525, self.parent.height * 0.28
+					size_hint: (0.125, 0.08)
 		            values: root.month_range_start
 		        	disabled: True
 		        	on_text: root.monthStartSelected(*args)
-		        	
+		        
+		        Label:
+					pos: self.parent.width * 0.7, self.parent.height * 0.37
+					size_hint: (0.2, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "End Month:"
+				    color: 0, 0, 0, 1
+				    	
 		        MySpinner:
 		            id: interval_step_range_end
 		            text: '<Month>'
-		            pos: self.parent.width * 0.3, self.parent.height * 0.05
-					size_hint: (0.22, 0.08)
+		            pos: self.parent.width * 0.7, self.parent.height * 0.28
+					size_hint: (0.125, 0.08)
 		            values: root.month_range_end
 		        	disabled: True
 		        	
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.73
+					pos: self.parent.width * 0.175, self.parent.height * 0.68
 					size_hint: (0.4, 0.08)
 					text_size: self.size
 					halign: "left"
 				    text: "Data Used:"
-				    color: 0, 0, 0, 1 
+				    color: 0, 0, 0, 1  
 				
 				MySpinner:
 		            id: data_type
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.64
+		            pos: self.parent.width * 0.175, self.parent.height * 0.59
 		            values: root.data_types  
 					on_text: root.updateStartYearSpinner()
 					
 				Label:
-					pos: self.parent.width * 0.55, self.parent.height * 0.73
+					pos: self.parent.width * 0.525, self.parent.height * 0.68
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
 				    text: "Data Operation:"
-				    color: 0, 0, 0, 1 
+				    color: 0, 0, 0, 1
 				
 				MySpinner:
 		            id: operation
 		            text: '<Select>'
-		            pos: self.parent.width * 0.55, self.parent.height * 0.64
-		            size_hint: (0.4, 0.08)
+		            pos: self.parent.width * 0.525, self.parent.height * 0.59
+		            size_hint: (0.3, 0.08)
 		            values: ['Highest', 'Lowest', 'Mean Average', 'Standard Deviation']   
 					
 				Button:
-					pos: self.parent.width * 0.55, self.parent.height * 0.05
-					size_hint: (0.4, 0.18)
+					pos: self.parent.width * 0.35, self.parent.height * 0.175
+					size_hint: (0.3, 0.08)
 					background_color: [0.2, 0.2, 0.77, 1]
 					background_normal: ''
 				    text: "Create and View Graph"
-				    on_press: root.create_graph()
+				    on_press: root.create_graph()  
 		Screen:
 			id: display
 			name: "display"
 			display_layout: display_layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: display_layout
 		    	graph: graph  
-				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "VIEW GRAPH"
-				    halign: "center"
-				    color: 1, 1, 1, 1
-				Image:
+				AsyncImage:
 					id: graph
-					pos: self.parent.width * 0.1, self.parent.height * -0.1
-					size_hint: (0.9, 1)
-					source: ''
+					pos: self.parent.width * 0.175, self.parent.height * 0.175
+					size_hint: (0.65, 0.65)
+					source: 'imgs/graph.png'
+					allow_stretch: True
+					keep_ratio: False
 				Button:
-					text: "<-"
-					pos: 0, self.parent.height * 0.6
+					pos: self.parent.width * 0.125, self.parent.height * 0.65
 					size_hint: (0.1, 0.2)
-					background_color: [0, 0, 1, 1]
-					background_normal: ''
+					background_normal: 'imgs/back.png'
+					background_down: 'imgs/back.png'
 					on_press: root.screen_manager.current = "selection"
+					

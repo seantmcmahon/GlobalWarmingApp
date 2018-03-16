@@ -5,6 +5,25 @@
 <ForecastingScreen>:
 	name: "screen3"
 	screen_manager: screen_manager
+	images: images
+	FloatLayout:
+		id: images
+		carousel: carousel
+		Carousel:
+			id: carousel
+			direction: "right"
+			scroll_timeout: 1
+			loop: True
+			canvas.after:
+        		Color:
+        			rgba: 1, 1, 1, 0.65
+            	Rectangle:
+            		pos: (self.width * 0.15, self.height * 0.15)
+            		size: (self.width * 0.7, self.height * 0.7)
+        	AsyncImage:
+        		source: "imgs/scotland.jpg"
+        		allow_stretch: True
+        		keep_ratio: False
 	ScreenManager:
 		id: screen_manager
 		selection: selection
@@ -13,17 +32,6 @@
 			id: selection
 			name: "selection"
 			layout: layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: layout
 		    	region: region
@@ -35,14 +43,16 @@
 		    	operation: operation 
 				
 				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "PREDICT FUTURE/PAST DATA"
-				    halign: "center"
-				    color: 1, 1, 1, 1
+					pos: self.parent.width * 0.15, self.parent.height * 0.72
+					size_hint: (0.7, 0.10)
+					text_size: self.size
+					font_size: 28
+					halign: "center"
+				    text: "Forecast Data"
+				    color: 0, 0, 0, 1
 				        
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.57
+					pos: self.parent.width * 0.175, self.parent.height * 0.52
 					size_hint: (0.22, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -52,12 +62,12 @@
 				MySpinner:
 		            id: region
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.49
+		            pos: self.parent.width * 0.175, self.parent.height * 0.44
 		            values: root.regions
 		                    
 				Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.42
-					size_hint: (0.47, 0.08)
+					pos: self.parent.width * 0.175, self.parent.height * 0.37
+					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
 				    text: "Data to predict:"
@@ -66,11 +76,11 @@
 				MySpinner:
 		            id: prediction_type
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.33
+		            pos: self.parent.width * 0.175, self.parent.height * 0.28
 		            values: ['Future Values', 'Past Values', 'Predict Both']
 		        
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.25
+					pos: self.parent.width * 0.525, self.parent.height * 0.52
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -80,43 +90,59 @@
 				MySpinner:
 		            id: time_step
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.15
+		            pos: self.parent.width * 0.525, self.parent.height * 0.44
 		            values: ['Full Year', 'Jan Annually', 'Feb Annually', 'Mar Annually', 'Apr Annually', 'May Annually', 'Jun Annually', 'Jul Annually', 'Aug Annually', 'Sep Annually', 'Oct Annually', 'Nov Annually', 'Dec Annually', 'Spring Annually', 'Summer Annually', 'Autumn Annually', 'Winter Annually', 'Custom Months Annually']  
 					on_text: root.timeStepSelected(*args)
-					
+				
+				Label:
+					pos: self.parent.width * 0.525, self.parent.height * 0.37
+					size_hint: (0.2, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "Start Month:"
+				    color: 0, 0, 0, 1
+				    	
 				MySpinner:
 		            id: interval_step_range_start
 		            text: '<Month>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.05
-					size_hint: (0.22, 0.08)
+		            pos: self.parent.width * 0.525, self.parent.height * 0.28
+					size_hint: (0.125, 0.08)
 		            values: root.month_range_start_list
 		        	disabled: root.month_range_start
 		        	on_text: root.monthStartSelected(*args)
 		        	
+		        Label:
+					pos: self.parent.width * 0.7, self.parent.height * 0.37
+					size_hint: (0.2, 0.08)
+					text_size: self.size
+					halign: "left"
+				    text: "End Month:"
+				    color: 0, 0, 0, 1
+				    
 		        MySpinner:
 		            id: interval_step_range_end
 		            text: '<Month>'
-		            pos: self.parent.width * 0.3, self.parent.height * 0.05
-					size_hint: (0.22, 0.08)
+		            pos: self.parent.width * 0.7, self.parent.height * 0.28
+					size_hint: (0.125, 0.08)
 		            values: root.month_range_end_list
 		        	disabled: root.month_range_end
 		        	
 		        Label:
-					pos: self.parent.width * 0.05, self.parent.height * 0.73
+					pos: self.parent.width * 0.175, self.parent.height * 0.68
 					size_hint: (0.4, 0.08)
 					text_size: self.size
 					halign: "left"
 				    text: "Data Used:"
-				    color: 0, 0, 0, 1 
+				    color: 0, 0, 0, 1
 				
 				MySpinner:
 		            id: data_type
 		            text: '<Select>'
-		            pos: self.parent.width * 0.05, self.parent.height * 0.64
-		            values: root.data_types 
+		            pos: self.parent.width * 0.175, self.parent.height * 0.59
+		            values: root.data_types   
 		        
 		        Label:
-					pos: self.parent.width * 0.55, self.parent.height * 0.73
+					pos: self.parent.width * 0.525, self.parent.height * 0.68
 					size_hint: (0.2, 0.08)
 					text_size: self.size
 					halign: "left"
@@ -126,50 +152,35 @@
 				MySpinner:
 		            id: operation
 		            text: '<Select>'
-		            pos: self.parent.width * 0.55, self.parent.height * 0.64
-		            size_hint: (0.4, 0.08)
+		            pos: self.parent.width * 0.525, self.parent.height * 0.59
+		            size_hint: (0.3, 0.08)
 		            values: ['Highest', 'Lowest', 'Mean Average', 'Standard Deviation']   
 				
 				Button:
-					pos: self.parent.width * 0.55, self.parent.height * 0.05
-					size_hint: (0.4, 0.18)
+					pos: self.parent.width * 0.35, self.parent.height * 0.175
+					size_hint: (0.3, 0.08)
 					background_color: [0.2, 0.2, 0.77, 1]
 					background_normal: ''
-				    text: "Predict and View Data"
+				    text: "Forecast and View Data"
 				    on_press: root.predict_data()
 		Screen:
 			id: display
 			name: "display"
 			display_layout: display_layout
-			canvas.before:
-		        Color:
-		            rgba: 1, 1, 1, 1
-		        Rectangle:
-		            pos: self.pos
-		            size: self.size
-		        Color:
-					rgba: [0.77, 0.15, 0.15, 1]
-				Rectangle:
-			        pos: 0, self.height * 0.8
-		            size: self.width, self.height * 0.2
 		    FloatLayout:   
 		    	id: display_layout
 		    	graph: graph  
-				Label:
-					pos: 0, self.parent.height * 0.8
-					size_hint: (1, 0.2)
-				    text: "PREDICTED DATA"
-				    halign: "center"
-				    color: 1, 1, 1, 1
 				Image:
 					id: graph
-					pos: self.parent.width * 0.1, self.parent.height * -0.1
-					size_hint: (0.9, 1)
+					pos: self.parent.width * 0.175, self.parent.height * 0.175
+					size_hint: (0.65, 0.65)
 					source: root.image_source
+					allow_stretch: True
+					keep_ratio: False
 				Button:
-					text: "<-"
-					pos: 0, self.parent.height * 0.6
+					pos: self.parent.width * 0.125, self.parent.height * 0.65
 					size_hint: (0.1, 0.2)
-					background_color: [0, 0, 1, 1]
-					background_normal: ''
+					background_normal: 'imgs/back.png'
+					background_down: 'imgs/back.png'
 					on_press: root.screen_manager.current = "selection"
+					

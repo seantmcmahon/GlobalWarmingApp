@@ -4,47 +4,55 @@
 <Menu>:
 	screen_manager: screen_manager
 	FloatLayout:
-		canvas:
-	        Color:
-	            rgba: [1, 0, 0, 1]
-	        Rectangle:
-	            size: self.size
+		Image:
+			pos: 0, 0
+			size_hint: (1, 1)
+			source: 'imgs/menuBackground.jpg'
+			allow_stretch: True
+			keep_ratio: False
 		Button:
 			text: "Data Visualisation"
 			pos: 0, self.parent.height * 0.8
 			size_hint: 1, 0.2
-			background_color: [0.77, 0.15, 0.15, 1]
+			background_color: [0, 0, 0, 0]
 			background_normal: ''
 			on_press: self.parent.parent.parent.toggle_screen('screen1')
 		Button:
 			text: "Data Analytics"
 			pos: 0, self.parent.height * 0.6
 			size_hint: 1, 0.2
-			background_color: [0.77, 0.15, 0.15, 1]
+			background_color: [0, 0, 0, 0]
 			background_normal: ''
 			on_press: self.parent.parent.parent.toggle_screen('screen2')
 		Button:
 			text: "Data Forecasting"
 			pos: 0, self.parent.height * 0.4
 			size_hint: 1, 0.2
-			background_color: [0.77, 0.15, 0.15, 1]
+			background_color: [0, 0, 0, 0]
 			background_normal: ''
 			on_press: self.parent.parent.parent.toggle_screen('screen3')
 	Screen:
-		FloatLayout:
+		RelativeLayout:
 			ScreenManager:
 				id: screen_manager
 				transition: sm.SwapTransition()
 				VisualisationScreen
 				AnalysingScreen
 				ForecastingScreen
-			Button:
-				text: "="
-				pos: 0, self.parent.height * 0.8
+			Image:
+				pos_hint: {'left': 1, 'top': 1}
+				size_hint: (0.1, None)
+				source: 'imgs/burgermenu.png'
+				#allow_stretch: True
+				#keep_ratio: False
+			Button
+				pos_hint: {'left': 1, 'top': 1}
 				size_hint: (0.1, 0.2)
-				background_color: [1, 0, 0, 1]
+				background_color: [0, 0, 0, 0]
 				background_normal: ''
+				background_down: ''
 				on_press: self.parent.parent.parent.parent.toggle_state()
+					
 		
 			
 		
