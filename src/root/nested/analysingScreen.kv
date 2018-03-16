@@ -82,8 +82,7 @@
 					background_color: [0.2, 0.2, 0.77, 1]
 					background_normal: ''
 				    text: "Analyse and View Data"
-				    #on_press: root.start_analysis()
-				    on_press: root.screen_manager.current = "textResults"
+				    on_press: root.start_analysis()
 		Screen:
 			id: display
 			name: "display"
@@ -124,18 +123,20 @@
 					halign: "center"
 				    text: "Results Explained"
 				    color: 0, 0, 0, 1
-				Label:
-					id: results
+				BoxLayout:
 					pos: self.parent.width * 0.175, self.parent.height * 0.175
-					width: self.parent.width * 0.7
-					size_hint_y: None
-				    text_size: self.parent.width * 0.7, None
-				    height: self.texture_size[1]
-					font_size: '10sp'
-					halign: "left"
-					#text: root.results_text
-					text: "blah blah blah " * 15
-					color: 0, 0, 0, 1
+					size: self.parent.width * 0.65, self.parent.height * 0.5
+					size_hint: (None, None)
+					ScrollView:
+						Label:
+							id: results
+							text: root.results_text
+							color: 0, 0, 0, 1
+							halign: "left"
+							valign: "middle"
+							text_size: self.width, None
+							size_hint_y: None
+        					height: self.texture_size[1]
 				Button:
 					pos: self.parent.width * 0.125, self.parent.height * 0.65
 					size_hint: (0.1, 0.2)

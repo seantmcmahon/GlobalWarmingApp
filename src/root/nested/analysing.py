@@ -54,6 +54,6 @@ class AnalysingScreen(Screen):
             self.graphName = self.path + '/imgs/globWarmResults.png'
             self.screen_manager.display.display_layout.graph.reload()
             self.results_text =\
-                "\n\n" + greatest + "\n\n" + smallest + "\n\n" + meanRes + "\n\n" + stdDevRes
+                greatest + "\n\n" + smallest + "\n\n" + meanRes + "\n\n" + stdDevRes
             self.loading.dismiss()
             self.screen_manager.current = "display"
