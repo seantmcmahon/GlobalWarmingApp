@@ -3,8 +3,8 @@ Created on 3 Feb 2018
 
 @author: seantmcmahon
 
-Class follows example code found at https://www.analyticsvidhya.com/blog/2016/
-02/time-series-forecasting-codes-python/
+Class follows example code found at 
+https://machinelearningmastery.com/make-sample-forecasts-arima-python/
 
 '''
 
@@ -48,10 +48,11 @@ class Predictor:
         bestModel = None
         for x in list(itertools.product(range(3), range(2), range(3))):
             (p, d, q) = x
-            res = self.arima(ts, p, d, q)
-            if res and res < bestResult:
-                bestResult = res
-                bestModel = x
+            if not p == d == q:
+                res = self.arima(ts, p, d, q)
+                if res and res < bestResult:
+                    bestResult = res
+                    bestModel = x
         return bestModel
 
     def difference(self, dataset):
@@ -79,7 +80,9 @@ class Predictor:
         return X[-10:]
 
     def get_forecast(self, series):
+        print "series", series
         (p, d, q) = self.getBestFitModel(series)
+        print p, d, q
         X = list(series.values)
         futures = [list(series.values)[-1]] + self.forecast(list(series.values), p, d, q)
         past = self.forecast(list(series.values)[::-1], p, d, q)[::-1] + [list(series.values)[0]]

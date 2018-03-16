@@ -83,3 +83,4 @@ class ForecastingScreen(Screen):
             self.screen_manager.display.display_layout.graph.reload()
             self.image_source = self.path + "/imgs/newModel.png"
             self.screen_manager.display.display_layout.graph.reload()
+            self.screen_manager.current = "display"

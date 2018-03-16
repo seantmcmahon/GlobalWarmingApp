@@ -142,22 +142,22 @@ class Dao:
         '''
         Return a Pandas Series
         '''
-        return df[value]
+        return df[value].fillna(method='ffill')
 
     def values_by_specified_month(self, df, value, month):
         month = self.months.index(month) + 1
-        return df[['yyyy', 'mm', value]].loc[df['mm'] == month].groupby(
+        return df[['yyyy', 'mm', value]].loc[df['mm'] == month].fillna(method='ffill').groupby(
             ['yyyy'])[value].apply(list)
 
     def values_by_annual_month_range(self, df, value, month_range):
-        return df.loc[df['mm'].isin(month_range)].groupby(
+        return df.loc[df['mm'].isin(month_range)].fillna(method='ffill').groupby(
             ['yyyy'])[value].apply(list)
 
     def values_by_season(self, df, value, includeSeasonName=False):
         temp = df.copy()
         temp['date'] = temp.index
         temp['marker'] = (temp['season'] != temp['season'].shift()).cumsum()
-        temp = temp.groupby('marker').agg({'date': 'first',  'season': 'first',
+        temp = temp.fillna(method='ffill').groupby('marker').agg({'date': 'first',  'season': 'first',
                                            value: lambda x: list(x)})
         if includeSeasonName:
             return temp.set_index('date').iloc[1:-1]
@@ -169,10 +169,10 @@ class Dao:
         return temp.loc[temp['season'] == season][value]
 
     def values_by_year(self, df, value):
-        return df.groupby('yyyy')[value].apply(list)
+        return df.fillna(method='ffill').groupby('yyyy')[value].apply(list)
 
     def values_by_decade(self, df, value):
-        return df.groupby((df.index.year//10)*10)[value].apply(list)
+        return df.fillna(method='ffill').groupby((df.index.year//10)*10)[value].apply(list)
 
     def get_table_for_country(self, country, value):
         countryStations = pd.concat(

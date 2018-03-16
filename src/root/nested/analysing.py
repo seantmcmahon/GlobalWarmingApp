@@ -39,17 +39,6 @@ class AnalysingScreen(Screen):
         self.loading = Popup(title='Loading...', content=Label(text='Performing Action...'),
                           size_hint=(0.5, 0.5), auto_dismiss=False)
 
-    def analyse(self):
-        region = self.screen_manager.selection.layout.region.text
-        data_type = self.screen_manager.selection.layout.data_type.text
-        greatest, smallest, meanRes, stdDevRes = self.analyser.analyse_data(
-                region, data_type, 500, 250)
-        self.graphName = ''
-        self.screen_manager.display.display_layout.graph.reload()
-        self.graphName = self.path + '/imgs/globWarmResults.png'
-        self.screen_manager.display.display_layout.graph.reload()
-        self.results_text =\
-            "\n\n" + greatest + "\n\n" + smallest + "\n\n" + meanRes + "\n\n" + stdDevRes
 
     def start_analysis(self):
         region = self.screen_manager.selection.layout.region.text
@@ -58,7 +47,13 @@ class AnalysingScreen(Screen):
             self.error.open()
         else:
             self.loading.open()
-            mythread = threading.Thread(target=self.analyse)
-            mythread.start()
+            greatest, smallest, meanRes, stdDevRes = self.analyser.analyse_data(
+                region, data_type, 500, 250)
+            self.graphName = ''
+            self.screen_manager.display.display_layout.graph.reload()
+            self.graphName = self.path + '/imgs/globWarmResults.png'
+            self.screen_manager.display.display_layout.graph.reload()
+            self.results_text =\
+                "\n\n" + greatest + "\n\n" + smallest + "\n\n" + meanRes + "\n\n" + stdDevRes
             self.loading.dismiss()
             self.screen_manager.current = "display"
