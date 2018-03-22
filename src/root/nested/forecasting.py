@@ -7,14 +7,13 @@ import os
 from predictor import Predictor
 from newDao import Dao
 import kivy
-kivy.require('1.9.1')
-
+import constants
 from kivy.lang import Builder
-from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.properties import StringProperty, ListProperty, BooleanProperty
+kivy.require('1.9.1')
 
 Builder.load_file('forecastingScreen.kv')
 
@@ -37,15 +36,14 @@ class ForecastingScreen(Screen):
         self.data_types = self.dao.getDataTypes()
         self.month_range_start = True
         self.month_range_end = True
-        self.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        self.month_range_start_list = self.months
-        self.month_range_end_list = self.months
+        self.month_range_start_list = constants.MONTH_LIST
+        self.month_range_end_list = constants.MONTH_LIST
         self.image_source = ''
-        self.error = Popup(title='Error', content=Label(text='Must specify a value for all options.'),
-                          size_hint=(0.5, 0.5))
+        self.error = Popup(title=constants.ERROR_LABEL, content=Label(
+            text=constants.ERROR_MESSAGE), size_hint=(0.5, 0.5))
 
     def timeStepSelected(self, *args):
-        if args[1] == "Custom Months Annually":
+        if args[1] == constants.CUSTOM_MONTHS:
             self.month_range_start = False
             self.month_range_end = False
         else:
@@ -53,32 +51,37 @@ class ForecastingScreen(Screen):
             self.month_range_end = True
 
     def monthStartSelected(self, *args):
-        start = self.screen_manager.selection.layout.interval_step_range_start.text
+        start = self.screen_manager.selection.layout.\
+            interval_step_range_start.text
         remaining_months = self.months[self.months.index(start):]
-        self.screen_manager.selection.layout.interval_step_range_end.text = '<Month>'
+        self.screen_manager.selection.layout.interval_step_range_end.text =\
+            constants.MONTH
         self.month_range_end_list = remaining_months
 
     def predict_data(self):
         region = self.screen_manager.selection.layout.region.text
         data_type = self.screen_manager.selection.layout.data_type.text
-        prediction_type = self.screen_manager.selection.layout.prediction_type.text
+        prediction_type = self.screen_manager.selection.layout.\
+            prediction_type.text
         operation = self.screen_manager.selection.layout.operation.text
         time_step = self.screen_manager.selection.layout.time_step.text
-        start = self.screen_manager.selection.layout.interval_step_range_start.text
+        start = self.screen_manager.selection.layout.\
+            interval_step_range_start.text
         end = self.screen_manager.selection.layout.interval_step_range_end.text
-        if "<Select>" in [region, data_type, prediction_type, time_step, operation] or\
-                (time_step == "Custom Months Annually" and "<Month>" in [start, end]):
+        if constants.OPTION_HOLDER in [region, data_type, prediction_type,
+                                       time_step, operation] or\
+                (time_step == constants.CUSTOM_MONTHS and constants.MONTH in
+                 [start, end]):
             self.error.open()
         else:
-            if time_step == "Custom Months Annually":
-                months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-                          "Aug", "Sep", "Oct", "Nov", "Dec"]
-                month_range = range(int(months.index(start)) + 1,
-                                    int(months.index(end)) + 2)
+            if time_step == constants.CUSTOM_MONTHS:
+                month_range = range(int(constants.MONTH_LIST.index(start)) + 1,
+                                    int(constants.MONTH_LIST.index(end)) + 2)
             else:
                 month_range = None
             self.predictor.plot_predictions(region, data_type, prediction_type,
-                                            time_step, operation, month_range, 500, 250)
+                                            time_step, operation, month_range,
+                                            500, 250)
             self.image_source = ''
             self.screen_manager.display.display_layout.graph.reload()
             self.image_source = self.path + "/imgs/newModel.png"

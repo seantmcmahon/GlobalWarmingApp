@@ -13,6 +13,7 @@ import os
 import numpy as np
 import itertools
 import math
+import constants
 from plotter import plotGraph
 from statsmodels.tsa.arima_model import ARIMA
 from datetime import datetime
@@ -87,8 +88,10 @@ class Predictor:
         futures = [list(series.values)[-1]] + self.forecast(list(series.values), p, d, q)
         past = self.forecast(list(series.values)[::-1], p, d, q)[::-1] + [list(series.values)[0]]
 
-        futuresIndex = [datetime(int(series.index[-1]), 1, 1)] + [datetime(x, 1, 1) for x in range(int(series.index[-1])+1, int(series.index[-1])+11)]
-        pastIndex = [datetime(x, 1, 1) for x in range(int(series.index[0])-10, int(series.index[0]))] + [datetime(int(series.index[0]), 1, 1)]
+        futuresIndex = [datetime(int(series.index[-1]), 1, 1)] +\
+            [datetime(x, 1, 1) for x in range(int(series.index[-1])+1, int(series.index[-1])+11)]
+        pastIndex = [datetime(x, 1, 1) for x in range(int(series.index[0])-10, int(series.index[0]))]\
+            + [datetime(int(series.index[0]), 1, 1)]
         currentIndex = pastIndex[:-1] + [datetime(int(x), 1, 1) for x in series.index] + futuresIndex[1:]
 
         pastSeries = (pd.Series(past, index=pastIndex), "Past Prediction")
@@ -110,15 +113,11 @@ class Predictor:
                                  end_year, time_step, operation,
                                  month_range)
         ts = pd.DataFrame({"ts": ts})
-        """try:
-            ts = ts[math.isnan(ts['ts']) != True]
-        except:
-            pass"""
         (past, current, future) = self.get_forecast(ts)
         results = []
-        if prediction_type == "Future Values":
+        if prediction_type == constants.FUTURE_VALUE:
             results = [current, future]
-        elif prediction_type == "Past Values":
+        elif prediction_type == constants.PAST_VALUE:
             results = [past, current]
         else:
             results = [past, current, future]

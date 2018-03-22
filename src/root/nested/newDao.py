@@ -4,6 +4,7 @@ Created on 26 Feb 2018
 @author: seantmcmahon
 '''
 
+import constants
 import pandas as pd
 import os
 from numpy import nanmean, nanstd
@@ -90,9 +91,6 @@ class Dao:
 
     def __init__(self):
         self.path = os.path.abspath(os.path.dirname(__file__))
-        self.months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-                       "Sep", "Oct", "Nov", "Dec"]
-        self.seasons = ["Spring", "Summer", "Autumn", "Winter"]
         self._stations = self._createStationDictionary()
         self._countryStationsMap = {
             "Scotland": ["Braemar", "Dunstaffnage", "Eskdalemuir", "Lerwick",
@@ -145,7 +143,7 @@ class Dao:
         return df[value].fillna(method='ffill')
 
     def values_by_specified_month(self, df, value, month):
-        month = self.months.index(month) + 1
+        month = constants.MONTH_LIST.index(month) + 1
         return df[['yyyy', 'mm', value]].loc[df['mm'] == month].fillna(method='ffill').groupby(
             ['yyyy'])[value].apply(list)
 
@@ -211,10 +209,10 @@ class Dao:
             return self.values_by_year(df, data).apply(op)
         elif step == "Decade":
             return self.values_by_decade(df, data).apply(op)
-        elif step.replace(" Annually", '') in self.months:
+        elif step.replace(" Annually", '') in constants.MONTH_LIST:
             return self.values_by_specified_month(
                 df, data, step.replace(" Annually", '')).apply(op)
-        elif step.replace(" Annually", '')in self.seasons:
+        elif step.replace(" Annually", '')in constants.SEASON_LIST:
             return self.values_by_specified_season(
                 df, data, step.replace(" Annually", '')).apply(op)
         else:  # Custom Month Range

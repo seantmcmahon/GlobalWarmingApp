@@ -9,12 +9,10 @@ from visualisation import VisualisationScreen
 from analysing import AnalysingScreen
 from forecasting import ForecastingScreen
 import kivy
-kivy.require('1.9.1')
-
 from kivy.app import App
 from kivy.garden.navigationdrawer import NavigationDrawer
 from kivy.uix.screenmanager import Screen
-
+kivy.require('1.9.1')
 
 
 class Menu(NavigationDrawer):

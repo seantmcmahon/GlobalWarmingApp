@@ -3,15 +3,17 @@ Created on 26 Dec 2017
 
 @author: seantmcmahon
 '''
+import constants
 from plotter import plotGraph
 import kivy
-kivy.require('1.9.1')
 from kivy.lang import Builder
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.properties import StringProperty, ListProperty, BooleanProperty
+from sklearn.gaussian_process.regression_models import constant
+kivy.require('1.9.1')
 
 Builder.load_file('visualisationScreen.kv')
 
@@ -33,50 +35,43 @@ class VisualisationScreen(Screen):
         self.data_types = self.dao.getDataTypes()
         self.start_year = []
         self.end_year = []
-        self.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        self.month_range_start = self.months
-        self.month_range_end = self.months
-        self.error = Popup(title='Error', content=Label(text='Must specify a value for all options.'),
+        self.month_range_start = constants.MONTH_LIST
+        self.month_range_end = constants.MONTH_LIST
+        self.error = Popup(title=constants.ERROR_LABEL, content=Label(text=constants.ERROR_MESSAGE),
                           size_hint=(0.5, 0.5))
 
     def updateStartYearSpinner(self):
         region = self.screen_manager.selection.layout.region.text
         data_type = self.screen_manager.selection.layout.data_type.text
-        if "<Select>" not in [region, data_type]:
-            self.screen_manager.selection.layout.start_year.text = 'Year'
+        if constants.OPTION_HOLDER not in [region, data_type]:
+            self.screen_manager.selection.layout.start_year.text = constants.YEAR
             self.screen_manager.selection.layout.start_year.disabled = False
             self.start_year = self.dao.getAvailableYearsForRegion(region, data_type)
 
     def updateEndYearSpinner(self):
         region = self.screen_manager.selection.layout.region.text
         data_type = self.screen_manager.selection.layout.data_type.text
-        self.screen_manager.selection.layout.end_year.text = 'Year'
+        self.screen_manager.selection.layout.end_year.text = constants.YEAR
         self.screen_manager.selection.layout.end_year.disabled = False
         start = self.screen_manager.selection.layout.start_year.text
         years = list(self.start_year)
         self.end_year = years[years.index(start):]
 
     def updatePossibleTimeSteps(self):
-        full_selection = ['Month', 'Season', 'Full Year', 'Jan Annually',
-                          'Feb Annually', 'Mar Annually', 'Apr Annually',
-                          'May Annually', 'Jun Annually', 'Jul Annually',
-                          'Aug Annually', 'Sep Annually', 'Oct Annually',
-                          'Nov Annually', 'Dec Annually', 'Spring Annually',
-                          'Summer Annually', 'Autumn Annually',
-                          'Winter Annually', 'Custom Months Annually']
+        full_selection = constants.FULL_TIME_STEP_SELECTION
         start_year = self.screen_manager.selection.layout.start_year.text
         end_year = self.screen_manager.selection.layout.end_year.text
         self.screen_manager.selection.layout.time_step.disabled = False
         if start_year == end_year:
-            self.screen_manager.selection.layout.time_step.values = ["Month", "Season"]
-            self.screen_manager.selection.layout.time_step.text = '<Time Step>'
-            self.screen_manager.selection.layout.interval_step_range_start.text = '<Month>'
-            self.screen_manager.selection.layout.interval_step_range_end.text = '<Month>'
+            self.screen_manager.selection.layout.time_step.values = constants.MONTH_SEASON_TIME_STEP_SELECTION
+            self.screen_manager.selection.layout.time_step.text = constants.OPTION_HOLDER
+            self.screen_manager.selection.layout.interval_step_range_start.text = constants.MONTH
+            self.screen_manager.selection.layout.interval_step_range_end.text = constants.MONTH
         else:
             self.screen_manager.selection.layout.time_step.values = full_selection
 
     def timeStepSelected(self, *args):
-        if args[1] == "Custom Months Annually":
+        if args[1] == constants.CUSTOM_MONTHS:
             self.screen_manager.selection.layout.interval_step_range_start.disabled = False
             self.screen_manager.selection.layout.interval_step_range_end.disabled = False
         else:
@@ -85,9 +80,12 @@ class VisualisationScreen(Screen):
 
     def monthStartSelected(self, *args):
         start = self.screen_manager.selection.layout.interval_step_range_start.text
-        remaining_months = self.months[self.months.index(start):]
-        self.screen_manager.selection.layout.interval_step_range_end.text = '<Month>'
-        self.month_range_end = remaining_months
+        self.screen_manager.selection.layout.interval_step_range_end.text = constants.MONTH
+        try:
+            remaining_months = constants.MONTH_LIST[constants.MONTH_LIST.index(start):]
+            self.month_range_end = remaining_months
+        except:
+            self.month_range_end = constants.MONTH_LIST
 
     def create_graph(self):
         details = {}
@@ -100,17 +98,16 @@ class VisualisationScreen(Screen):
         start = self.screen_manager.selection.layout.interval_step_range_start.text
         end = self.screen_manager.selection.layout.interval_step_range_end.text
         month_range = None
-        if "<Select>" in [region, data_type, start_year, end_year, time_step, operation] or\
-                (time_step == "Custom Months Annually" and "<Month>" in [start, end]):
+        if constants.OPTION_HOLDER in [region, data_type, start_year, end_year, time_step, operation] or\
+                (time_step == constants.CUSTOM_MONTHS and constants.MONTH in [start, end]) or\
+                constants.YEAR in [start_year, end_year]:
             self.error.open()
         else:
-            if self.screen_manager.selection.layout.time_step.text == "Custom Months Annually":
+            if self.screen_manager.selection.layout.time_step.text == constants.CUSTOM_MONTHS:
                 start = self.screen_manager.selection.layout.interval_step_range_start.text
                 end = self.screen_manager.selection.layout.interval_step_range_end.text
-                months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-                          "Aug", "Sep", "Oct", "Nov", "Dec"]
-                month_range = range(int(months.index(start))+1,
-                                               int(months.index(end))+2)
+                month_range = range(int(constants.MONTH_LIST.index(start))+1,
+                                               int(constants.MONTH_LIST.index(end))+2)
 
             series = (self.dao.get_values(region, data_type, start_year, end_year,
                                          time_step, operation, month_range), "Data Series")
