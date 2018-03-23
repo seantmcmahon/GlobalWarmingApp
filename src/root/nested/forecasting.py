@@ -53,7 +53,7 @@ class ForecastingScreen(Screen):
     def monthStartSelected(self, *args):
         start = self.screen_manager.selection.layout.\
             interval_step_range_start.text
-        remaining_months = self.months[self.months.index(start):]
+        remaining_months = constants.MONTH_LIST[constants.MONTH_LIST.index(start):]
         self.screen_manager.selection.layout.interval_step_range_end.text =\
             constants.MONTH
         self.month_range_end_list = remaining_months

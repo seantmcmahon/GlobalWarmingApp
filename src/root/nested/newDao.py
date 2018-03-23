@@ -155,12 +155,13 @@ class Dao:
         temp = df.copy()
         temp['date'] = temp.index
         temp['marker'] = (temp['season'] != temp['season'].shift()).cumsum()
-        temp = temp.fillna(method='ffill').groupby('marker').agg({'date': 'first',  'season': 'first',
+        temp = temp.fillna(method='ffill').groupby('marker').agg({'date': 'first', 'yyyy': 'first', 'season': 'first',
                                            value: lambda x: list(x)})
+        print temp.head()
         if includeSeasonName:
-            return temp.set_index('date').iloc[1:-1]
+            return temp.set_index('yyyy').iloc[1:-1]
         else:
-            return temp.set_index('date').iloc[1:-1][value]
+            return temp.set_index('yyyy').iloc[1:-1][value]
 
     def values_by_specified_season(self, df, value, season):
         temp = self.values_by_season(df, value, includeSeasonName=True)
