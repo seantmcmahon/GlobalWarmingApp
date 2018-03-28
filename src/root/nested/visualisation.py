@@ -49,13 +49,16 @@ class VisualisationScreen(Screen):
             self.start_year = self.dao.getAvailableYearsForRegion(region, data_type)
 
     def updateEndYearSpinner(self):
-        region = self.screen_manager.selection.layout.region.text
-        data_type = self.screen_manager.selection.layout.data_type.text
-        self.screen_manager.selection.layout.end_year.text = constants.YEAR
-        self.screen_manager.selection.layout.end_year.disabled = False
-        start = self.screen_manager.selection.layout.start_year.text
-        years = list(self.start_year)
-        self.end_year = years[years.index(start):]
+        try:
+            region = self.screen_manager.selection.layout.region.text
+            data_type = self.screen_manager.selection.layout.data_type.text
+            self.screen_manager.selection.layout.end_year.text = constants.YEAR
+            self.screen_manager.selection.layout.end_year.disabled = False
+            start = self.screen_manager.selection.layout.start_year.text
+            years = list(self.start_year)
+            self.end_year = years[years.index(start):]
+        except:
+            self.end_year = years
 
     def updatePossibleTimeSteps(self):
         full_selection = constants.FULL_TIME_STEP_SELECTION
