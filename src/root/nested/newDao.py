@@ -157,7 +157,6 @@ class Dao:
         temp['marker'] = (temp['season'] != temp['season'].shift()).cumsum()
         temp = temp.fillna(method='ffill').groupby('marker').agg({'date': 'first', 'yyyy': 'first', 'season': 'first',
                                            value: lambda x: list(x)})
-        print temp.head()
         if includeSeasonName:
             return temp.set_index('yyyy').iloc[1:-1]
         else:
@@ -201,7 +200,6 @@ class Dao:
         data = self._dataTypes.get(datatype)
         df = self.get_table(region, data).loc[start:end]
         op = self._operations.get(operation)
-        print "df", df
         if step == "Month":
             return self.values_by_month(df, data)
         elif step == "Season":

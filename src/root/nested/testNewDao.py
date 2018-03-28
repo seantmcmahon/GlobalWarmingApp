@@ -4,10 +4,13 @@ Created on 26 Feb 2018
 @author: seantmcmahon
 '''
 import unittest
+import pandas as pd
 from newDao import Dao
+import testConstants
 
 
-class Test(unittest.TestCase):
+class TestsDao(unittest.TestCase):
+    longMessage = True
 
     def setUp(self):
         self.dao = Dao()
@@ -33,47 +36,6 @@ class Test(unittest.TestCase):
 
     def testGetRegionNames(self):
         self.assertEquals(len(self.dao.getRegionNames()), 42)
-
-    def testGetAvailableYearsForRegion_SingleStation(self):
-        vals = [('Aberporth', "Max Temp", 0, '1942'),
-                ('Aberporth', "Max Temp", -1, '2016'),
-                ('Aberporth', "Min Temp", 0, '1942'),
-                ('Aberporth', "Min Temp", -1, '2016'),
-                ('Aberporth', "Mean Temp", 0, '1942'),
-                ('Aberporth', "Mean Temp", -1, '2016'),
-                ('Aberporth', "Air Frost Days", 0, '1957'),
-                ('Aberporth', "Air Frost Days", -1, '2016'),
-                ('Aberporth', "Rainfall", 0, '1941'),
-                ('Aberporth', "Rainfall", -1, '2016'),
-                ('Aberporth', "Sun Hours", 0, '1942'),
-                ('Aberporth', "Sun Hours", -1, '2016'),
-                ('Scotland', "Max Temp", 0, '1873'),
-                ('Scotland', "Max Temp", -1, '2016'),
-                ('England', "Min Temp", 0, '1853'),
-                ('England', "Min Temp", -1, '2016'),
-                ('England', "Mean Temp", 0, '1853'),
-                ('England', "Mean Temp", -1, '2016'),
-                ('Wales', "Air Frost Days", 0, '1930'),
-                ('Wales', "Air Frost Days", -1, '2016'),
-                ('Northern Ireland', "Rainfall", 0, '1853'),
-                ('Northern Ireland', "Rainfall", -1, '2016'),
-                ('Northern Ireland', "Sun Hours", 0, '1929'),
-                ('Northern Ireland', "Sun Hours", -1, '2016'),
-                ('UK', "Max Temp", 0, '1853'),
-                ('UK', "Max Temp", -1, '2016'),
-                ('UK', "Min Temp", 0, '1853'),
-                ('UK', "Min Temp", -1, '2016'),
-                ('UK', "Mean Temp", 0, '1853'),
-                ('UK', "Mean Temp", -1, '2016'),
-                ('UK', "Air Frost Days", 0, '1853'),
-                ('UK', "Air Frost Days", -1, '2016'),
-                ('UK', "Rainfall", 0, '1853'),
-                ('UK', "Rainfall", -1, '2016'),
-                ('UK', "Sun Hours", 0, '1890'),
-                ('UK', "Sun Hours", -1, '2016')]
-        for x in vals:
-            self.assertEquals(self.dao.getAvailableYearsForRegion(
-                x[0], x[1])[x[2]], x[3])
 
     def test_values_by_month(self):
         expectedValues = [("Aberporth", "rain", [74.7])]
@@ -107,13 +69,6 @@ class Test(unittest.TestCase):
             "rain").iloc[0], [74.7, 69.1, 76.2, 33.7, 51.3, 25.7,
                               53.9, 91.8, 25.5, 106.2, 92.3, 86.5])
 
-    def test_get_table_for_country(self):
-        testAndExpectedValues = [("Northern Ireland", "rain", 0, 57.3),
-                                 ("Northern Ireland", "rain", -1, 131.4)]
-        for x in testAndExpectedValues:
-            self.assertAlmostEquals(self.dao.get_table_for_country(
-                x[0], x[1])[x[1]].tolist()[x[2]], x[3])
-
     def get_table_for_uk(self):
         self.assertAlmostEquals(
             self.dao.get_table_for_uk(
@@ -127,7 +82,54 @@ class Test(unittest.TestCase):
             "Aberporth", "Rainfall", '1941', '1942', "Full Year", "Highest",
             month_range=None).iloc[0], 106.2)
 
+    def test_get_data_types(self):
+        self.assertEqual(sorted(self.dao.getDataTypes()),
+                         sorted(["Max Temp", "Min Temp", "Mean Temp", "Rainfall", "Air Frost Days", "Sun Hours"]))
 
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()
+    def test_get_operations(self):
+        self.assertEqual(sorted(self.dao.getPossibleOperations()),
+                         sorted(["Highest", "Lowest", "Mean Average", "Standard Deviation"]))
+
+
+"""Following code is adated from tutorial on https://
+eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases"""
+
+
+def make_test_years_for_region_and_data(description, region, data, index, expectedValue):
+    def test(self):
+        years = self.dao.getAvailableYearsForRegion(region, data)
+        self.assertEquals(years[index], expectedValue, description)
+    return test
+
+
+def make_test_get_table_for_country(description, region, data, index, expectedValue):
+    def test(self):
+        df = self.dao.get_table_for_country(region, data)
+        groupedResults = df.groupby(df.index)[data].apply(list)
+        self.assertEquals(sorted(groupedResults.iloc[index]), sorted(expectedValue))
+    return test
+
+
+def make_test_get_season(description, month, expectedValue):
+    def test(self):
+        series = pd.Series([month], index=['mm'])
+        self.assertEquals(self.dao.get_season(series), expectedValue)
+    return test
+
+
+testYearsMap = testConstants.getYearsForRegionAndDataTypeMap
+for name, params in testYearsMap.iteritems():
+    test_func = make_test_years_for_region_and_data(name, params[0], params[1], params[2], params[3])
+    setattr(TestsDao, 'testGetAvailableYearsForRegion_{0}'.format(name), test_func)
+
+
+testTableForCountryMap = testConstants.getTableForCountryMap
+for name, params in testTableForCountryMap.iteritems():
+    test_func = make_test_get_table_for_country(name, params[0], params[1], params[2], params[3])
+    setattr(TestsDao, 'test_get_table_for_country_{0}'.format(name), test_func)
+
+
+testGetSeasonMap = testConstants.getSeasonMap
+for name, params in testGetSeasonMap.iteritems():
+    test_func = make_test_get_season(name, params[0], params[1])
+    setattr(TestsDao, 'test_get_season_{0}'.format(name), test_func)

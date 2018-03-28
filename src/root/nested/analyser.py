@@ -63,32 +63,26 @@ class Analyser:
     def analyseMean(self, values, region, dataType):
         m, c = self.getGradient(values)
         if m > 0:
-            message = "From the data available, there is evidence of an" +\
-                " increase in " + dataType + " in " + region + \
-                ", as can be seen in the previous graph."
+            if dataType in ["Max Temp", "Min Temp", "Mean Temp"]:
+                message = constants.TEMP_INCREASE_MEAN.format(dataType, region)
+            else:
+                message = constants.NONTEMP_INCREASE_MEAN.format(dataType, region)
         else:
-            message = "From the data available, there is no evidence of an"\
-                + " increase in " + dataType + " in " + region +\
-                " as can be seen in the previous graph."\
-                + "From this test, there is no evidence of climate change in "\
-                + region
+            if dataType in ["Max Temp", "Min Temp", "Mean Temp"]:
+                message = constants.TEMP_DECREASE_MEAN.format(dataType, region)
+            else:
+                message = constants.NONTEMP_DECREASE_MEAN.format(dataType, region)
         valuelist = values.tolist()
         series = [values, [(m * x) + c for x in range(len(valuelist))]]
-        return("Mean " + dataType + " for: "
+        return("Average " + dataType + " for: "
                + region, dataType, series, message)
 
     def analyseStd(self, values, region, dataType):
         m, c = self.getGradient(values)
         if m > 0:
-            message = "From the data available, there is evidence of an"\
-                + " increase in " + dataType + " variance in " + region\
-                + ", as can be seen in the previous graph."
+            message = constants.INCREASE_STDDEV.format(dataType, region)
         else:
-            message = "From the data available, there is no evidence of an"\
-                + "increase in " + dataType + "variance in " + region + \
-                ", as can be seen in the previous graph."\
-                + "From this test, there is no evidence of climate change in "\
-                + region
+            message = constants.DECREASE_STDDEV.format(dataType, region)
         valuelist = values.tolist()
         series = [values, [(m * x) + c for x in range(len(valuelist))]]
         return (dataType + " Std. Dev. Data Variance: " +

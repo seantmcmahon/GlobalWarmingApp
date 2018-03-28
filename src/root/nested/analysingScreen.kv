@@ -104,10 +104,11 @@
 					background_down: 'imgs/back.png'
 					on_press: root.screen_manager.current = "selection"
 				Button:
-					pos: self.parent.width * 0.9, self.parent.height * 0.6
-					size_hint: (0.1, 0.2)
-					background_normal: 'imgs/help.png'
-					background_down: 'imgs/help.png'
+					pos: self.parent.width * 0.775, self.parent.height * 0.65
+					size_hint: (0.1, None)
+					height: self.width
+					background_normal: 'imgs/question.png'
+					background_down: 'imgs/question.png'
 					on_press: root.screen_manager.current = "textResults"
 		Screen:
 			id: textResults

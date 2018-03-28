@@ -23,4 +23,12 @@ ERROR_LABEL = "ERROR"
 ERROR_MESSAGE = 'Must specify a value for all options.'
 FUTURE_VALUE = "Future Values"
 PAST_VALUE = "Past Values"
-BOTH_VALUE =  "Both Values"
+BOTH_VALUE = "Both Values"
+
+TEMP_INCREASE_MEAN = "From the data available, there is evidence of an increase in {0} averages in {1}, as can be seen in the previous graph. From this test, there is evidence of climate change for this data type."
+TEMP_DECREASE_MEAN = "From the data available, there is evidence of a decrease in {0} averages in {1}, as can be seen in the previous graph. From this test, there is no evidence of climate change for this data type."
+NONTEMP_INCREASE_MEAN = "From the data available, there is evidence of an increase in {0} averages in {1}, as can be seen in the previous graph. From this test, there is no evidence of climate change for this data type."
+NONTEMP_DECREASE_MEAN = "From the data available, there is evidence of a decrease in {0} averages in {1}, as can be seen in the previous graph. From this test, there is evidence of climate change for this data type."
+
+INCREASE_STDDEV = "From the data available, there is evidence of an increase in {0} variance in {1}, as can be seen in the previous graph. From this test, there is evidence of climate change for this data type."
+DECREASE_STDDEV = "From the data available, there is evidence of a decrease in {0} variance in {1}, as can be seen in the previous graph. From this test, there is no evidence of climate change for this data type."
